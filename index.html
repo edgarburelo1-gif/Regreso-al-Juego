@@ -2,2030 +2,696 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Regreso al Juego</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Regreso al Juego">
+<title>⚽ Regreso al Juego</title>
 <style>
-  :root{
-    --bg: #122019;
-    --panel: #1C2E24;
-    --panel-2: #223829;
-    --line: #F2F5EE;
-    --line-dim: #8FA396;
-    --tape: #3E6E8E;
-    --tape-light: #6FA0C2;
-    --amber: #E2A63B;
-    --danger: #C1553D;
-    --good: #6FA07A;
-    --border: rgba(242,245,238,0.10);
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background: var(--bg);
-    color: var(--line);
-    font-family: 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    padding-bottom: 90px;
-  }
-  .wrap{max-width:520px;margin:0 auto;padding:20px 16px;}
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: #0a0a0f; color: #e8e4dc; font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif; min-height: 100vh; padding-bottom: 80px; }
+  .header { background: linear-gradient(135deg, #0f0f1a 0%, #1a1025 100%); border-bottom: 1px solid #2a2040; padding: 52px 20px 20px; text-align: center; }
+  .header-eyebrow { font-size: 10px; letter-spacing: 4px; color: #8b7fa8; text-transform: uppercase; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .header-stats { display: flex; justify-content: center; gap: 40px; margin-top: 16px; }
+  .stat-box { text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 900; }
+  .stat-lbl { font-size: 9px; color: #6b6080; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .header-status { margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
 
-  header.top{
-    display:flex; justify-content:space-between; align-items:baseline;
-    margin-bottom:18px;
-  }
-  header.top h1{
-    font-family:'Oswald', sans-serif;
-    font-weight:600;
-    font-size:22px;
-    letter-spacing:0.3px;
-    margin:0;
-    color: var(--line);
-  }
-  header.top .date{
-    font-size:12px;
-    color: var(--line-dim);
-  }
+  .start-banner { margin: 14px 20px 0; background: #0f0f1a; border: 1px solid #2a2040; border-radius: 12px; padding: 12px 14px; font-size: 12px; color: #a094c0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .start-banner button { background: #4c3880; color: #fff; border: none; border-radius: 7px; padding: 7px 11px; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+  .start-banner .link { color: #6b6080; font-size: 10.5px; text-decoration: underline; cursor: pointer; flex-shrink: 0; }
 
-  .scoreboard{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:1px;
-    background: var(--border);
-    border:1px solid var(--border);
-    border-radius:10px;
-    overflow:hidden;
-    margin-bottom:18px;
-  }
-  .stat{
-    background: var(--panel);
-    padding:14px 10px;
-    text-align:center;
-  }
-  .stat .num{
-    font-family:'Oswald', sans-serif;
-    font-size:28px;
-    font-weight:600;
-    line-height:1;
-    color: var(--line);
-  }
-  .stat .lbl{
-    font-size:10.5px;
-    color: var(--line-dim);
-    margin-top:6px;
-  }
-  .stat.pain-ok .num{color:var(--good);}
-  .stat.pain-mid .num{color:var(--amber);}
-  .stat.pain-high .num{color:var(--danger);}
+  .week-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #0f0f1a; border-bottom: 1px solid #1e1a2e; position: sticky; top: 0; z-index: 10; }
+  .week-btn { background: #1e1a2e; border: none; color: #a094c0; border-radius: 8px; padding: 6px 16px; font-size: 16px; cursor: pointer; }
+  .week-info { text-align: center; }
+  .week-title { font-weight: 700; font-size: 14px; color: #fff; }
+  .week-sub { font-size: 10px; color: #6b6080; margin-top: 2px; }
 
-  .phase-card{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:14px;
-    margin-bottom:18px;
-  }
-  .phase-card .cap{
-    font-size:11px;
-    color: var(--line-dim);
-    margin-bottom:10px;
-    display:flex;
-    justify-content:space-between;
-  }
-  .pitch{
-    display:grid;
-    grid-template-columns: repeat(4, 1fr);
-    border:1px solid var(--line-dim);
-    border-radius:6px;
-    overflow:hidden;
-  }
-  .pitch .zone{
-    padding:10px 4px;
-    text-align:center;
-    font-size:10.5px;
-    color: var(--line-dim);
-    border-right:1px dashed rgba(242,245,238,0.25);
-    background: transparent;
-  }
-  .pitch .zone:last-child{border-right:none;}
-  .pitch .zone.active{
-    background: var(--tape);
-    color: var(--line);
-    font-weight:600;
-  }
-  .phase-suggestion{
-    margin-top:10px;
-    background: rgba(111,160,122,0.14);
-    border:1px solid rgba(111,160,122,0.4);
-    color: var(--good);
-    font-size:12px;
-    padding:9px 11px;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:8px;
-  }
-  .phase-suggestion button{
-    background: var(--good);
-    color: #0F1A13;
-    border:none;
-    border-radius:6px;
-    padding:6px 10px;
-    font-size:11.5px;
-    font-weight:600;
-    cursor:pointer;
-    flex-shrink:0;
-  }
+  .tab-bar { display: flex; gap: 8px; padding: 12px 20px 0; }
+  .tab-btn { flex: 1; padding: 9px 0; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: #4c3880; color: #fff; }
+  .tab-btn.inactive { background: #1a1630; color: #6b6080; }
 
-  .tabs{
-    display:flex;
-    gap:6px;
-    margin-bottom:16px;
-    flex-wrap:wrap;
-  }
-  .tab{
-    flex:1;
-    min-width: 70px;
-    text-align:center;
-    padding:10px 4px;
-    font-size:12.5px;
-    border-radius:8px;
-    background: var(--panel);
-    color: var(--line-dim);
-    border:1px solid var(--border);
-    cursor:pointer;
-  }
-  .tab.active{
-    background: var(--tape);
-    color: var(--line);
-    border-color: var(--tape);
-  }
+  .content { padding: 16px 20px; }
 
-  .view{display:none;}
-  .view.active{display:block;}
+  .section-title { margin-top: 24px; margin-bottom: 10px; }
+  .section-title:first-child { margin-top: 8px; }
+  .section-title-row { display: flex; align-items: center; gap: 8px; }
+  .section-title-text { font-weight: 800; font-size: 14px; color: #fff; letter-spacing: -0.3px; }
+  .section-subtitle { font-size: 10px; color: #5a5070; margin-top: 2px; margin-left: 26px; letter-spacing: 0.5px; text-transform: uppercase; }
 
-  .section-title{
-    font-family:'Oswald', sans-serif;
-    font-size:16px;
-    font-weight:500;
-    margin: 4px 0 10px 0;
-    color: var(--line);
-  }
+  .level-badge { display: inline-block; background: #1a1630; border: 1px solid #4c3880; color: #a094c0; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
 
-  .warn{
-    background: rgba(226,166,59,0.12);
-    border:1px solid rgba(226,166,59,0.4);
-    color: var(--amber);
-    font-size:12.5px;
-    padding:10px 12px;
-    border-radius:8px;
-    margin-bottom:16px;
-    line-height:1.4;
-  }
-  .info-note{
-    background: rgba(62,110,142,0.14);
-    border:1px solid rgba(62,110,142,0.4);
-    color: var(--tape-light);
-    font-size:12.5px;
-    padding:10px 12px;
-    border-radius:8px;
-    margin-bottom:16px;
-    line-height:1.4;
-  }
-  .reminder-banner{
-    background: rgba(62,110,142,0.16);
-    border:1px solid rgba(62,110,142,0.5);
-    color: var(--tape-light);
-    font-size:12.5px;
-    padding:10px 12px;
-    border-radius:8px;
-    margin-bottom:16px;
-    line-height:1.4;
-  }
-  .edit-banner{
-    background: rgba(226,166,59,0.16);
-    border:1px solid rgba(226,166,59,0.5);
-    color: var(--amber);
-    font-size:12.5px;
-    padding:10px 12px;
-    border-radius:8px;
-    margin-bottom:14px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:8px;
-  }
-  .edit-banner button{
-    background: var(--amber);
-    color:#241C0B;
-    border:none;
-    border-radius:6px;
-    padding:6px 10px;
-    font-size:11.5px;
-    font-weight:600;
-    cursor:pointer;
-    flex-shrink:0;
-  }
+  .day-folder { background: #0f0f1a; border: 1px solid #1e1a2e; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  .day-folder-header { padding: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .day-folder-icon { font-size: 18px; flex-shrink: 0; }
+  .day-folder-body { flex: 1; }
+  .day-folder-name { font-weight: 700; font-size: 14px; color: #e8e4dc; }
+  .day-folder-sub { font-size: 11px; color: #5a5070; margin-top: 2px; }
+  .day-folder-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 20px; }
+  .badge.ok { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .badge.mid { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .badge.high { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .chevron { font-size: 12px; color: #5a5070; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(90deg); }
 
-  .day-select{
-    display:flex; gap:6px; margin-bottom:14px;
-  }
-  .day-select button{
-    flex:1;
-    padding:8px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background: var(--panel);
-    color: var(--line-dim);
-    font-size:13px;
-    font-family:'Inter', sans-serif;
-    cursor:pointer;
-  }
-  .day-select button.active{
-    background: var(--panel-2);
-    color: var(--line);
-    border-color: var(--tape-light);
-  }
+  .day-folder-content { display: none; padding: 0 14px 14px; border-top: 1px solid #1e1a2e; }
+  .day-folder-content.open { display: block; padding-top: 12px; }
 
-  .exercise{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:12px;
-    margin-bottom:8px;
-  }
-  .exercise .top-row{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    margin-bottom:10px;
-  }
-  .exercise input[type=checkbox]{
-    width:20px; height:20px;
-    margin-top:2px;
-    accent-color: var(--tape);
-    flex-shrink:0;
-  }
-  .exercise .name{font-size:14px; color:var(--line); font-weight:500;}
-  .exercise .reps{font-size:12px; color:var(--line-dim); margin-top:2px;}
-  .exercise.done .name{color:var(--line-dim);}
+  .day-type-row { margin-bottom: 12px; }
+  .day-type-row label { font-size: 10px; color: #5a5070; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .day-type-row select { width: 100%; background: #1a1630; border: 1px solid #2a2040; color: #e8e4dc; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; font-family: inherit; }
 
-  .exercise .fields{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:6px;
-  }
-  .exercise .field{
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-  }
-  .exercise .field label{
-    font-size:9.5px;
-    color: var(--line-dim);
-  }
-  .exercise .field input{
-    background: var(--panel-2);
-    border:1px solid var(--border);
-    color: var(--line);
-    border-radius:6px;
-    padding:7px 6px;
-    font-size:13px;
-    width:100%;
-    font-family:'Inter', sans-serif;
-  }
+  .rest-note { font-size: 12px; color: #5a5070; padding: 6px 0 14px; line-height: 1.5; }
 
-  .pain-slider-row{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:14px;
-    margin-top:12px;
-  }
-  .pain-slider-row .cap{font-size:12.5px; color:var(--line-dim); margin-bottom:8px;}
-  input[type=range]{width:100%; accent-color: var(--amber);}
-  .pain-val{font-family:'Oswald',sans-serif; font-size:20px; text-align:center; margin-top:4px;}
+  .exercise-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #16131f; }
+  .exercise-row:last-of-type { border-bottom: none; }
+  .exercise-check { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid #2a2040; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+  .exercise-check.done { background: #1e3a22; border-color: #2a5030; }
+  .exercise-name { font-size: 12.5px; color: #e8e4dc; font-weight: 600; }
+  .exercise-reps { font-size: 10.5px; color: #5a5070; margin-top: 1px; }
+  .exercise-video { display: inline-block; margin-top: 5px; font-size: 10.5px; font-weight: 700; color: #a094c0; text-decoration: none; padding: 3px 9px; background: #1a1630; border-radius: 20px; border: 1px solid #2a2040; }
 
-  .btn{
-    width:100%;
-    padding:13px;
-    border-radius:8px;
-    border:none;
-    background: var(--tape);
-    color: var(--line);
-    font-size:14px;
-    font-weight:600;
-    font-family:'Inter', sans-serif;
-    margin-top:14px;
-    cursor:pointer;
-  }
-  .btn:active{opacity:0.85;}
-  .btn.secondary{background: var(--panel-2); border:1px solid var(--border);}
-  .btn.danger-outline{background:transparent; border:1px solid var(--danger); color:var(--danger);}
+  .flag-toggle { width: 100%; margin-top: 4px; padding: 10px; border-radius: 8px; border: 1px solid #3a1a1a; background: #1a0f0f; color: #c0a0a0; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .flag-toggle.on { background: #ef4444; border-color: #ef4444; color: #fff; }
 
-  .meal-card{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:12px 14px;
-    margin-bottom:10px;
-  }
-  .meal-card .meal-title{
-    font-size:13px; color: var(--tape-light); font-weight:600; margin-bottom:4px;
-  }
-  .meal-card ul{margin:4px 0 0 0; padding-left:18px; font-size:13px; color:var(--line); line-height:1.5;}
+  .control-block { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #1e1a2e; }
+  .control-title { font-size: 10px; color: #8b7fa8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
+  .control-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .control-field { flex: 1; }
+  .control-field label { font-size: 10.5px; color: #5a5070; display: block; margin-bottom: 4px; }
+  .control-field input { width: 100%; background: #1a1630; border: 1px solid #2a2040; color: #e8e4dc; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+  .save-day-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #4c3880; color: #fff; font-weight: 700; font-size: 12.5px; cursor: pointer; }
 
-  .checklist-item{
-    display:flex; align-items:center; gap:10px;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:11px 12px;
-    margin-bottom:8px;
-    font-size:13.5px;
-  }
-  .checklist-item input{width:19px;height:19px;accent-color:var(--good);}
+  .limits-card { background: #1a0f0f; border: 1px solid #3a1a1a; border-radius: 14px; padding: 14px; }
+  .limit-row { display: flex; gap: 10px; padding: 8px 0; align-items: flex-start; }
+  .limit-row:not(:last-child) { border-bottom: 1px solid #2a1515; }
+  .limit-x { color: #ef4444; font-size: 14px; flex-shrink: 0; }
+  .limit-text { font-size: 12px; color: #c0a0a0; line-height: 1.5; }
 
-  .weight-form{
-    display:flex; gap:8px; margin-bottom:16px;
-  }
-  .weight-form input{
-    flex:1;
-    background: var(--panel);
-    border:1px solid var(--border);
-    color: var(--line);
-    padding:10px 12px;
-    border-radius:8px;
-    font-size:14px;
-    font-family:'Inter', sans-serif;
-  }
-  .weight-form button{
-    padding:10px 16px;
-    border-radius:8px;
-    border:none;
-    background: var(--tape);
-    color: var(--line);
-    font-weight:600;
-    font-size:13px;
-  }
+  .review-hero { background: #0f0f1a; border: 1px solid #2a2040; border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center; }
+  .review-eyebrow { font-size: 10px; color: #6b6080; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .review-pct { font-size: 52px; font-weight: 900; line-height: 1; }
+  .review-sub { font-size: 12px; color: #8b7fa8; margin-top: 6px; }
+  .review-pain { font-size: 12px; color: #f59e0b; margin-top: 8px; font-weight: 600; }
 
-  .chart-card{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:14px;
-    margin-bottom:16px;
-  }
-  .chart-card .cap{font-size:12px; color:var(--line-dim); margin-bottom:8px;}
-  svg{width:100%; height:auto; display:block;}
+  .progress-item { background: #0f0f1a; border: 1px solid #1e1a2e; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .progress-emoji { font-size: 16px; flex-shrink: 0; }
+  .progress-body { flex: 1; }
+  .progress-name { font-size: 12px; font-weight: 600; color: #e8e4dc; margin-bottom: 4px; }
+  .progress-bar-bg { height: 4px; background: #1e1a2e; border-radius: 4px; }
+  .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+  .progress-count { font-size: 12px; font-weight: 700; min-width: 40px; text-align: right; }
 
-  .summary-grid{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:10px;
-    margin-bottom:16px;
-  }
-  .summary-card{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:12px;
-  }
-  .summary-card .cap{font-size:10.5px; color:var(--line-dim); margin-bottom:8px;}
-  .summary-row{display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;}
-  .summary-row span.v{color:var(--line); font-weight:600;}
+  .week-history { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .week-pill { width: 44px; border-radius: 10px; padding: 8px 4px; text-align: center; border: 1px solid; }
+  .week-pill-label { font-size: 9px; color: #5a5070; margin-bottom: 4px; }
+  .week-pill-val { font-size: 12px; font-weight: 700; }
 
-  .history-row{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:10px 12px;
-    margin-bottom:7px;
-    font-size:12.5px;
-  }
-  .history-row .h-top{
-    display:flex; justify-content:space-between; align-items:center;
-    cursor:pointer;
-  }
-  .history-row .h-top .v{color:var(--line);}
-  .history-row .h-detail{
-    display:none;
-    margin-top:9px;
-    padding-top:9px;
-    border-top:1px solid var(--border);
-    font-size:12px;
-    color: var(--line-dim);
-  }
-  .history-row .h-detail.open{display:block;}
-  .history-row .h-detail .ex-line{margin-bottom:4px;}
-  .h-actions{display:flex; gap:8px; margin-top:10px;}
-  .icon-btn{
-    flex:1;
-    text-align:center;
-    padding:7px;
-    border-radius:6px;
-    font-size:11.5px;
-    cursor:pointer;
-    border:1px solid var(--border);
-    background: var(--panel-2);
-    color: var(--line-dim);
-  }
-  .icon-btn.danger{color:var(--danger); border-color:rgba(193,85,61,0.4);}
-  .icon-btn.accent{color:var(--tape-light); border-color:rgba(111,160,194,0.4);}
+  .bw-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .bw-card { flex: 1; border-radius: 12px; padding: 12px; text-align: center; }
+  .bw-card.best { background: #0f2a14; border: 1px solid #2a5030; }
+  .bw-card.worst { background: #2a0f0f; border: 1px solid #5a1a1a; }
+  .bw-eyebrow { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .bw-card.best .bw-eyebrow { color: #4ade80; }
+  .bw-card.worst .bw-eyebrow { color: #ef4444; }
+  .bw-week { font-size: 20px; font-weight: 800; }
+  .bw-card.best .bw-week { color: #4ade80; }
+  .bw-card.worst .bw-week { color: #ef4444; }
+  .bw-pct { font-size: 12px; }
+  .bw-card.best .bw-pct { color: #4ade80; }
+  .bw-card.worst .bw-pct { color: #ef4444; }
 
-  .simple-list-row{
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:12.5px;
-    color: var(--line-dim);
-    padding:8px 0;
-    border-bottom:1px solid var(--border);
-  }
-  .simple-list-row span.v{color:var(--line);}
-  .simple-list-row .row-actions{display:flex; gap:6px;}
-  .simple-list-row .row-actions button{
-    background: none; border:none; color:var(--line-dim); font-size:13px; cursor:pointer; padding:2px 5px;
-  }
-  .simple-list-row .row-actions button.danger{color:var(--danger);}
-  .simple-list-row .row-actions button.accent{color:var(--tape-light);}
+  .footer-note { background: #0f0f1a; border: 1px solid #2a2040; border-radius: 12px; padding: 14px; font-size: 11px; color: #5a5070; line-height: 1.7; text-align: center; }
+  .footer-note span { color: #8b7fa8; font-weight: 600; }
 
-  .empty{
-    text-align:center;
-    color: var(--line-dim);
-    font-size:12.5px;
-    padding:16px 0;
-  }
+  .checkpoint-card { background: linear-gradient(135deg, #1a1025 0%, #0f0f1a 100%); border: 1px solid #4c3880; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .checkpoint-eyebrow { font-size: 10px; color: #a094c0; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+  .checkpoint-goal { font-size: 13px; color: #fff; font-weight: 700; margin-bottom: 12px; }
+  .checkpoint-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #241b38; cursor: pointer; }
+  .checkpoint-item.auto { cursor: default; }
+  .checkpoint-item:last-of-type { border-bottom: none; }
+  .checkpoint-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #4c3880; flex-shrink: 0; display:flex; align-items:center; justify-content:center; font-size: 12px; margin-top: 1px; }
+  .checkpoint-check.done { background: #4ade80; border-color: #4ade80; color: #0a0a0f; }
+  .checkpoint-check.fail { background: #ef4444; border-color: #ef4444; color: #fff; }
+  .checkpoint-text { font-size: 12px; color: #d0c8e0; line-height: 1.4; }
+  .checkpoint-text small { display: block; color: #6b6080; margin-top: 2px; }
+  .checkpoint-result { margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; }
+  .checkpoint-result.ok { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .checkpoint-result.pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
 
-  .rom-form, .flag-form{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:14px;
-    margin-bottom:16px;
-  }
-  .rom-form .row, .flag-form .row{
-    display:flex;
-    gap:8px;
-    margin-bottom:8px;
-  }
-  .rom-form select, .flag-form select, .rom-form input, .flag-form input, .flag-form textarea{
-    flex:1;
-    background: var(--panel-2);
-    border:1px solid var(--border);
-    color: var(--line);
-    padding:9px 10px;
-    border-radius:8px;
-    font-size:13px;
-    font-family:'Inter', sans-serif;
-  }
-  .flag-form textarea{resize:vertical; min-height:50px; width:100%;}
+  .cp-history-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #1e1a2e; font-size: 12px; }
+  .cp-history-row:last-child { border-bottom: none; }
+  .cp-history-status { font-weight: 700; }
+  .project-list { background: #0f0f1a; border: 1px solid #1e1a2e; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
 
-  .flag-row{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-left:3px solid var(--amber);
-    border-radius:6px;
-    padding:9px 11px;
-    margin-bottom:7px;
-    font-size:12.5px;
-  }
-  .flag-row .meta{color:var(--line-dim); font-size:11px; margin-bottom:3px;}
-  .flag-row .row-actions{display:flex; gap:8px; margin-top:7px;}
-  .flag-row .row-actions button{
-    background: none; border:1px solid var(--border); border-radius:6px; color:var(--line-dim);
-    font-size:11px; cursor:pointer; padding:4px 8px;
-  }
-  .flag-row .row-actions button.danger{color:var(--danger);}
-
-  .template-grid{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap:8px;
-    margin-bottom:14px;
-  }
-  .template-btn{
-    text-align:left;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:12px 14px;
-    cursor:pointer;
-    color: var(--line);
-  }
-  .template-btn .t-name{font-size:14px; font-weight:600; color: var(--tape-light); margin-bottom:3px;}
-  .template-btn .t-obj{font-size:12px; color: var(--line-dim); line-height:1.4;}
-  .template-btn .t-weeks{font-size:11px; color: var(--line-dim); margin-top:5px;}
-
-  .custom-cycle-form{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:12px;
-    margin-bottom:14px;
-  }
-  .custom-cycle-form input, .custom-cycle-form select{
-    width:100%;
-    background: var(--panel-2);
-    border:1px solid var(--border);
-    color: var(--line);
-    padding:9px 10px;
-    border-radius:8px;
-    font-size:13px;
-    margin-bottom:8px;
-    font-family:'Inter', sans-serif;
-  }
-
-  .active-cycle-card{
-    background: var(--panel);
-    border:1px solid var(--tape-light);
-    border-radius:10px;
-    padding:14px;
-    margin-bottom:16px;
-  }
-  .active-cycle-card .c-name{font-family:'Oswald',sans-serif; font-size:17px; color:var(--line); margin-bottom:4px;}
-  .active-cycle-card .c-obj{font-size:12.5px; color:var(--line-dim); margin-bottom:10px; line-height:1.4;}
-  .active-cycle-card .c-dates{font-size:11.5px; color:var(--line-dim); margin-bottom:8px;}
-  .progress-bar{
-    background: var(--panel-2);
-    border-radius:6px;
-    height:8px;
-    overflow:hidden;
-    margin-bottom:10px;
-  }
-  .progress-bar .fill{
-    height:100%;
-    background: var(--tape-light);
-  }
-
-  .cycle-history-row{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:10px 12px;
-    margin-bottom:8px;
-    font-size:12px;
-  }
-  .cycle-history-row .h-name{color:var(--line); font-weight:600; font-size:13px; margin-bottom:4px;}
-  .cycle-history-row .h-line{color:var(--line-dim); margin-bottom:2px;}
-
-  .cal-nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-  .cal-nav button{
-    background: var(--panel-2);
-    border:1px solid var(--border);
-    color: var(--line);
-    border-radius:6px;
-    width:32px; height:28px;
-    font-size:14px;
-    cursor:pointer;
-  }
-  .calendar-grid{
-    display:grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap:4px;
-  }
-  .cal-cell{
-    aspect-ratio:1;
-    background: var(--panel-2);
-    border-radius:6px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    font-size:10.5px;
-    color: var(--line-dim);
-    position:relative;
-  }
-  .cal-cell.blank{background:transparent;}
-  .cal-cell .dot{
-    width:6px; height:6px; border-radius:50%;
-    margin-top:3px;
-  }
-  .cal-cell .flag-dot{
-    position:absolute; top:3px; right:3px;
-    width:5px; height:5px; border-radius:50%;
-    background: var(--danger);
-  }
-  .dotA{background: var(--tape-light);}
-  .dotB{background: var(--good);}
-  .dotC{background: var(--amber);}
-  .dotFlag{background: var(--danger);}
-  .cal-legend{
-    display:flex; flex-wrap:wrap; gap:12px;
-    margin-top:12px;
-    font-size:11px;
-    color: var(--line-dim);
-  }
-  .cal-legend span{display:flex; align-items:center; gap:5px;}
-  .cal-legend .dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
-
-  .backup-row{display:flex; gap:8px;}
-  .backup-row .btn{margin-top:0;}
-  #importFileInput{display:none;}
-
-  .toast{
-    position:fixed;
-    top:14px;
-    left:50%;
-    transform:translateX(-50%) translateY(-20px);
-    background: var(--good);
-    color:#0F1A13;
-    font-size:13px;
-    font-weight:600;
-    padding:11px 18px;
-    border-radius:8px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.3);
-    z-index:200;
-    opacity:0;
-    transition: opacity .25s ease, transform .25s ease;
-    max-width:90%;
-    text-align:center;
-  }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-
-  .help-btn{
-    width:26px; height:26px;
-    border-radius:50%;
-    border:1px solid var(--line-dim);
-    background: transparent;
-    color: var(--line-dim);
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-    flex-shrink:0;
-  }
-  .header-row{display:flex; align-items:center; gap:10px;}
-
-  .modal-overlay{
-    display:none;
-    position:fixed; inset:0;
-    background: rgba(0,0,0,0.6);
-    z-index:300;
-    align-items:flex-end;
-    justify-content:center;
-  }
-  .modal-overlay.show{display:flex;}
-  .modal-card{
-    background: var(--panel);
-    border-top:1px solid var(--border);
-    border-radius:16px 16px 0 0;
-    padding:20px 18px 24px;
-    max-width:520px;
-    width:100%;
-    max-height:80vh;
-    overflow-y:auto;
-  }
-  .modal-card h2{
-    font-family:'Oswald', sans-serif;
-    font-size:18px;
-    margin:0 0 4px 0;
-    color: var(--line);
-  }
-  .modal-card .step{
-    display:flex;
-    gap:10px;
-    margin-top:14px;
-  }
-  .modal-card .step .num{
-    font-family:'Oswald', sans-serif;
-    font-size:16px;
-    color: var(--tape-light);
-    flex-shrink:0;
-    width:22px;
-  }
-  .modal-card .step .txt{font-size:13px; color:var(--line); line-height:1.5;}
-  .modal-card .step .txt b{color:var(--tape-light);}
-  .modal-card .btn{margin-top:20px;}
-
-  .cycle-card{
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:14px;
-    margin-bottom:18px;
-    cursor:pointer;
-  }
-  .cycle-card .cap{
-    font-size:11px;
-    color: var(--line-dim);
-    margin-bottom:8px;
-  }
-  .cycle-card .cc-name{
-    font-family:'Oswald', sans-serif;
-    font-size:17px;
-    color: var(--line);
-    margin-bottom:4px;
-  }
-  .cycle-card .cc-obj{font-size:12.5px; color:var(--line-dim); margin-bottom:10px; line-height:1.4;}
-  .cycle-card .cc-meta{font-size:11.5px; color:var(--line-dim); margin-bottom:8px;}
-  .cycle-card .cc-empty{font-size:13px; color:var(--line-dim); margin-bottom:10px; line-height:1.5;}
-  .cycle-card .cc-cta{
-    display:inline-block;
-    background: var(--tape);
-    color: var(--line);
-    font-size:12.5px;
-    font-weight:600;
-    padding:8px 12px;
-    border-radius:7px;
-  }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 999; }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <div class="header-row">
-      <h1>Regreso al Juego</h1>
-      <button class="help-btn" id="helpBtn">?</button>
-    </div>
-    <div class="date" id="todayDate"></div>
-  </header>
-
-  <div id="toastSlot"></div>
-
-  <div class="modal-overlay" id="helpModal">
-    <div class="modal-card">
-      <h2>¿Cómo funciona esta app?</h2>
-      <div class="step"><div class="num">1</div><div class="txt"><b>Elige un ciclo</b> en la pestaña Ciclos (ej. "Fuerza base"). Cada ciclo dura varias semanas y tiene un solo objetivo.</div></div>
-      <div class="step"><div class="num">2</div><div class="txt"><b>Tu fase se mueve sola.</b> El ciclo que elijas define automáticamente en qué fase de recuperación estás — ya no la tocas a mano.</div></div>
-      <div class="step"><div class="num">3</div><div class="txt"><b>Tu rutina cambia con la fase.</b> Los ejercicios del Día A/B/C en la pestaña Rutina se ajustan solos según el ciclo activo.</div></div>
-      <div class="step"><div class="num">4</div><div class="txt"><b>Registra cada entrenamiento</b> ahí mismo (peso, reps, RPE y dolor). Progreso y Clínico son solo para ver cómo vas — peso, dolor, ROM, banderas rojas.</div></div>
-      <div class="step"><div class="num">5</div><div class="txt"><b>Cierra el ciclo</b> cuando termine (o cuando la app te avise que cumples los criterios) para comparar tus resultados del inicio al final, y elige el siguiente ciclo.</div></div>
-      <button class="btn" id="closeHelpBtn">Entendido</button>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="cycleResultModal">
-    <div class="modal-card" id="cycleResultCard"></div>
-  </div>
-
-  <div class="cycle-card" id="cycleSummaryCard"></div>
-
-  <div id="reminderSlot"></div>
-
-  <div class="scoreboard">
-    <div class="stat" id="streakStat">
-      <div class="num" id="streakNum">0</div>
-      <div class="lbl">racha</div>
-    </div>
-    <div class="stat" id="weightStat">
-      <div class="num" id="weightNum">78</div>
-      <div class="lbl">kg actual</div>
-    </div>
-    <div class="stat" id="painStat">
-      <div class="num" id="painNum">-</div>
-      <div class="lbl">dolor hoy</div>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" data-view="rutina">Rutina</div>
-    <div class="tab" data-view="alimentacion">Comida</div>
-    <div class="tab" data-view="progreso">Progreso</div>
-    <div class="tab" data-view="clinico">Clínico</div>
-    <div class="tab" data-view="ciclos">Ciclos</div>
-  </div>
-
-  <!-- RUTINA -->
-  <div class="view active" id="view-rutina">
-    <div class="warn">
-      Si el dolor pasa de 5/10 durante un ejercicio, detente y reduce el rango de movimiento. Por ahora: nada de sentadillas profundas ni saltos si no están indicados en tu fase.
-    </div>
-    <div id="editBannerSlot"></div>
-
-    <div class="day-select" id="daySelect">
-      <button data-day="A" class="active">Día A</button>
-      <button data-day="B">Día B</button>
-      <button data-day="C">Día C</button>
-    </div>
-
-    <div id="exerciseList"></div>
-
-    <div class="pain-slider-row">
-      <div class="cap">¿Qué tanto dolor sentiste ese día en la rodilla? (0 = nada, 10 = muy fuerte)</div>
-      <input type="range" min="0" max="10" value="3" id="painSlider">
-      <div class="pain-val" id="painSliderVal">3</div>
-    </div>
-
-    <button class="btn" id="saveWorkoutBtn">Guardar entrenamiento</button>
-  </div>
-
-  <!-- ALIMENTACION -->
-  <div class="view" id="view-alimentacion">
-    <div class="section-title">Guía de comidas</div>
-    <div class="warn">
-      Sin mariscos. Todo con ingredientes que se consiguen en cualquier tienda o mercado. Meta aproximada de proteína: ~140g al día para ayudar a la recuperación de tejido.
-    </div>
-
-    <div class="meal-card">
-      <div class="meal-title">Desayuno</div>
-      <ul>
-        <li>2-3 huevos + avena o pan integral + fruta</li>
-        <li>o yogurt natural + avena + plátano + un puñado de nuez o cacahuate</li>
-      </ul>
-    </div>
-    <div class="meal-card">
-      <div class="meal-title">Comida (lo que se cocine en casa)</div>
-      <ul>
-        <li>Agrega una porción extra de proteína aparte: pollo, res, huevo o frijoles</li>
-        <li>Suma una porción de verdura, aunque sea sencilla (ensalada, verdura cocida)</li>
-      </ul>
-    </div>
-    <div class="meal-card">
-      <div class="meal-title">Cena (no te la saltes)</div>
-      <ul>
-        <li>Huevos revueltos + frijoles + tortilla</li>
-        <li>o pechuga o bistec a la plancha + ensalada</li>
-        <li>si no hay tiempo: yogurt + fruta + puñado de nuez</li>
-      </ul>
-    </div>
-
-    <div class="section-title" style="margin-top:18px;">Checklist de hoy</div>
-    <div class="checklist-item">
-      <input type="checkbox" data-meal="desayuno" class="mealCheck">
-      <span>Desayuno con proteína</span>
-    </div>
-    <div class="checklist-item">
-      <input type="checkbox" data-meal="comida" class="mealCheck">
-      <span>Comida con proteína extra + verdura</span>
-    </div>
-    <div class="checklist-item">
-      <input type="checkbox" data-meal="cena" class="mealCheck">
-      <span>Cena (no me la salté)</span>
-    </div>
-    <div class="checklist-item">
-      <input type="checkbox" data-meal="agua" class="mealCheck">
-      <span>Tomé agua suficiente</span>
-    </div>
-  </div>
-
-  <!-- PROGRESO -->
-  <div class="view" id="view-progreso">
-    <div class="section-title">Resumen</div>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="cap">Últimos 7 días</div>
-        <div class="summary-row"><span>Entrenamientos</span><span class="v" id="sum7Workouts">-</span></div>
-        <div class="summary-row"><span>Dolor promedio</span><span class="v" id="sum7Pain">-</span></div>
-        <div class="summary-row"><span>Cambio de peso</span><span class="v" id="sum7Weight">-</span></div>
-        <div class="summary-row"><span>Banderas rojas</span><span class="v" id="sum7Flags">-</span></div>
-      </div>
-      <div class="summary-card">
-        <div class="cap">Últimos 30 días</div>
-        <div class="summary-row"><span>Entrenamientos</span><span class="v" id="sum30Workouts">-</span></div>
-        <div class="summary-row"><span>Dolor promedio</span><span class="v" id="sum30Pain">-</span></div>
-        <div class="summary-row"><span>Cambio de peso</span><span class="v" id="sum30Weight">-</span></div>
-        <div class="summary-row"><span>Banderas rojas</span><span class="v" id="sum30Flags">-</span></div>
-      </div>
-    </div>
-
-    <div class="section-title">Registrar peso</div>
-    <div class="weight-form">
-      <input type="number" step="0.1" id="weightInput" placeholder="Peso en kg">
-      <button id="saveWeightBtn">Guardar</button>
-    </div>
-
-    <div class="chart-card">
-      <div class="cap">Peso (kg) en el tiempo</div>
-      <svg id="weightChart" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
-    </div>
-    <div class="section-title">Historial de peso</div>
-    <div id="weightList"></div>
-
-    <div class="chart-card">
-      <div class="cap">Dolor de rodilla (0-10) en el tiempo</div>
-      <svg id="painChart" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
-    </div>
-
-    <div class="section-title">Historial de entrenamientos</div>
-    <div id="historyList"></div>
-  </div>
-
-  <!-- CLINICO -->
-  <div class="view" id="view-clinico">
-    <div class="section-title">Rango de movimiento (ROM)</div>
-    <div class="rom-form">
-      <div class="row">
-        <select id="romKnee">
-          <option value="izquierda">Rodilla izquierda</option>
-          <option value="derecha">Rodilla derecha</option>
-        </select>
-        <input type="number" id="romDegrees" placeholder="Grados de flexión">
-      </div>
-      <button class="btn secondary" id="saveRomBtn" style="margin-top:0;">Guardar ROM de hoy</button>
-    </div>
-    <div class="chart-card">
-      <div class="cap">ROM rodilla izquierda (grados) en el tiempo</div>
-      <svg id="romChart" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
-    </div>
-    <div class="section-title">Historial de ROM</div>
-    <div id="romList"></div>
-
-    <div class="section-title" style="margin-top:20px;">Banderas rojas</div>
-    <div class="warn">
-      Marca aquí cualquier hinchazón, chasquido/truene o sensación de inestabilidad — cosas fuera del dolor normal de entrenar. Si se repiten, coméntalo con tu fisio.
-    </div>
-    <div class="flag-form">
-      <div class="row">
-        <select id="flagType">
-          <option value="Hinchazón">Hinchazón</option>
-          <option value="Chasquido / truena">Chasquido / truena</option>
-          <option value="Inestabilidad">Sensación de inestabilidad</option>
-          <option value="Otro">Otro</option>
-        </select>
-      </div>
-      <div class="row">
-        <textarea id="flagNote" placeholder="Detalle breve (opcional)"></textarea>
-      </div>
-      <button class="btn danger-outline" id="saveFlagBtn" style="margin-top:0;">Registrar bandera roja</button>
-    </div>
-    <div id="flagsList"></div>
-
-    <div class="section-title" style="margin-top:20px;">Reporte para tu fisio</div>
-    <div class="info-note">
-      Genera un archivo de texto con tus últimos 30 días de entrenamiento, dolor, ROM y banderas rojas para llevar o enviar a tu fisio o médico.
-    </div>
-    <button class="btn" id="exportBtn">Descargar reporte (.txt)</button>
-
-    <div class="section-title" style="margin-top:20px;">Copia de seguridad</div>
-    <div class="info-note">
-      Todo se guarda solo en este navegador. Si cambias de celular o borras datos, lo pierdes. Descarga esta copia de vez en cuando y guárdala (Drive, WhatsApp a ti mismo, etc.) para poder restaurarla si hace falta.
-    </div>
-    <div class="backup-row">
-      <button class="btn secondary" id="backupExportBtn">Descargar copia (.json)</button>
-      <button class="btn secondary" id="backupImportBtn">Restaurar copia</button>
-    </div>
-    <input type="file" id="importFileInput" accept="application/json">
-  </div>
-
-  <!-- CICLOS -->
-  <div class="view" id="view-ciclos">
-    <div class="section-title">Ciclo actual</div>
-    <div id="activeCycleSlot"></div>
-    <div id="phaseSuggestionSlot"></div>
-
-    <div class="section-title">Historial de ciclos</div>
-    <div id="cycleHistoryList"></div>
-
-    <div class="section-title">Calendario de constancia</div>
-    <div class="chart-card">
-      <div class="cal-nav">
-        <button id="calPrev">‹</button>
-        <div class="cap" id="calendarMonthLabel" style="margin:0;">Mes</div>
-        <button id="calNext">›</button>
-      </div>
-      <div class="calendar-grid" id="calendarGrid"></div>
-      <div class="cal-legend">
-        <span><i class="dot dotA"></i> Día A</span>
-        <span><i class="dot dotB"></i> Día B</span>
-        <span><i class="dot dotC"></i> Día C</span>
-        <span><i class="dot dotFlag"></i> Bandera roja</span>
-      </div>
-    </div>
-  </div>
-
-</div>
+<div id="app"></div>
+<div class="toast" id="toast">✓ Guardado</div>
 
 <script>
-const STORAGE_KEY = 'regresoAlJuegoData';
+const WEEKS_TOTAL = 16;
+const STORAGE_KEY = 'regreso_al_juego_v6';
 
-// Exercises now depend on the recovery phase (0-3), so the routine progresses as you advance.
-const EXERCISES_BY_PHASE = [
-  { // Fase 0: Movilidad y control
-    A: [
-      {id:'a1', name:'Movilidad activa de rodilla (sentado, flexo-extensión)', reps:'3 x 15'},
-      {id:'a2', name:'Isometría de cuádriceps (contracción sostenida)', reps:'3 x 20 seg'},
-      {id:'a3', name:'Elevación de pierna recta', reps:'3 x 12'},
-      {id:'a4', name:'Bicicleta estática suave', reps:'10 min'},
-      {id:'a5', name:'Estiramiento de isquiotibiales', reps:'3 x 30 seg'},
-    ],
-    B: [
-      {id:'b1', name:'Movilidad de tobillo y rodilla combinada', reps:'3 x 12'},
-      {id:'b2', name:'Puente de glúteo bipodal', reps:'3 x 12'},
-      {id:'b3', name:'Balance en dos pies (superficie estable)', reps:'3 x 30 seg'},
-      {id:'b4', name:'Sentadilla parcial en pared (rango muy corto)', reps:'3 x 10'},
-      {id:'b5', name:'Activación de glúteo medio con banda', reps:'3 x 15'},
-    ],
-    C: [
-      {id:'c1', name:'Caminata controlada', reps:'10-15 min'},
-      {id:'c2', name:'Extensión de rodilla sentado con banda ligera', reps:'3 x 15'},
-      {id:'c3', name:'Círculos de cadera', reps:'3 x 10 c/lado'},
-      {id:'c4', name:'Plancha en rodillas', reps:'3 x 20-30 seg'},
-      {id:'c5', name:'Respiración y relajación', reps:'5 min'},
-    ],
+const DAY_NAMES = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+// Programación por defecto (se puede reasignar día por día desde la app).
+const DEFAULT_DAY_MAP = { 0: 'A', 2: 'B', 4: 'C' };
+
+// Niveles de dificultad. Se sube de nivel automáticamente al pasar una revisión de bloque.
+const ROUTINE_LEVELS = [
+  { // Nivel 0: Fuerza base
+    name: 'Fuerza base',
+    A: { label: 'Rutina A — Fuerza', exercises: [
+      { id:'a1', name:'Prensa de piernas (rango parcial)', reps:'3 x 12' },
+      { id:'a2', name:'Peso muerto rumano con mancuernas', reps:'3 x 10' },
+      { id:'a3', name:'Puente de glúteo a una pierna', reps:'3 x 12 c/lado' },
+      { id:'a4', name:'Extensión de rodilla con banda', reps:'3 x 15' },
+      { id:'a5', name:'Elevación de talones', reps:'3 x 15' },
+    ]},
+    B: { label: 'Rutina B — Estabilidad', exercises: [
+      { id:'b1', name:'Sentadilla búlgara asistida (rango parcial)', reps:'3 x 10 c/lado' },
+      { id:'b2', name:'Step-up en escalón bajo', reps:'3 x 10 c/lado' },
+      { id:'b3', name:'Balance en un pie', reps:'3 x 30 seg c/lado' },
+      { id:'b4', name:'Plancha frontal', reps:'3 x 30-45 seg' },
+      { id:'b5', name:'Band walks (caminata lateral con banda)', reps:'3 x 15 pasos c/lado' },
+    ]},
+    C: { label: 'Rutina C — Funcional', exercises: [
+      { id:'c1', name:'Sentadilla goblet (solo rango sin dolor)', reps:'3 x 12' },
+      { id:'c2', name:'Zancada estática (rango corto)', reps:'3 x 10 c/lado' },
+      { id:'c3', name:'Hip thrust', reps:'3 x 12' },
+      { id:'c4', name:'Dead bug', reps:'3 x 10 c/lado' },
+      { id:'c5', name:'Bici estática (bajo impacto)', reps:'10-15 min' },
+    ]},
   },
-  { // Fase 1: Fuerza base
-    A: [
-      {id:'a1', name:'Prensa de piernas (rango parcial)', reps:'3 x 12'},
-      {id:'a2', name:'Peso muerto rumano con mancuernas', reps:'3 x 10'},
-      {id:'a3', name:'Puente de glúteo a una pierna', reps:'3 x 12 c/lado'},
-      {id:'a4', name:'Extensión de rodilla con banda', reps:'3 x 15'},
-      {id:'a5', name:'Elevación de talones', reps:'3 x 15'},
-    ],
-    B: [
-      {id:'b1', name:'Sentadilla búlgara asistida (rango parcial)', reps:'3 x 10 c/lado'},
-      {id:'b2', name:'Step-up en escalón bajo', reps:'3 x 10 c/lado'},
-      {id:'b3', name:'Balance en un pie', reps:'3 x 30 seg c/lado'},
-      {id:'b4', name:'Plancha frontal', reps:'3 x 30-45 seg'},
-      {id:'b5', name:'Band walks (caminata lateral con banda)', reps:'3 x 15 pasos c/lado'},
-    ],
-    C: [
-      {id:'c1', name:'Sentadilla goblet (solo rango sin dolor)', reps:'3 x 12'},
-      {id:'c2', name:'Zancada estática (rango corto)', reps:'3 x 10 c/lado'},
-      {id:'c3', name:'Hip thrust', reps:'3 x 12'},
-      {id:'c4', name:'Dead bug', reps:'3 x 10 c/lado'},
-      {id:'c5', name:'Bici estática (bajo impacto)', reps:'10-15 min'},
-    ],
+  { // Nivel 1: Estabilidad dinámica
+    name: 'Estabilidad dinámica',
+    A: { label: 'Rutina A — Estabilidad dinámica', exercises: [
+      { id:'a1', name:'Sentadilla a una pierna asistida (a caja)', reps:'3 x 8 c/lado' },
+      { id:'a2', name:'Peso muerto rumano a una pierna', reps:'3 x 8 c/lado' },
+      { id:'a3', name:'Zancada caminando (rango controlado)', reps:'3 x 10 pasos c/lado' },
+      { id:'a4', name:'Extensión de rodilla con banda (más resistencia)', reps:'3 x 15' },
+      { id:'a5', name:'Elevación de talones a una pierna', reps:'3 x 12 c/lado' },
+    ]},
+    B: { label: 'Rutina B — Estabilidad dinámica', exercises: [
+      { id:'b1', name:'Step-down lateral (bajada controlada)', reps:'3 x 10 c/lado' },
+      { id:'b2', name:'Balance en superficie inestable (cojín/bosu)', reps:'3 x 30 seg c/lado' },
+      { id:'b3', name:'Band walks con más tensión', reps:'3 x 15 pasos c/lado' },
+      { id:'b4', name:'Plancha lateral', reps:'3 x 30 seg c/lado' },
+      { id:'b5', name:'Elevación de rodilla alterna controlada', reps:'3 x 10 c/lado' },
+    ]},
+    C: { label: 'Rutina C — Estabilidad dinámica', exercises: [
+      { id:'c1', name:'Cambios de dirección lentos (caminando)', reps:'3 x 8 c/lado' },
+      { id:'c2', name:'Sentadilla goblet completa (si tolera)', reps:'3 x 12' },
+      { id:'c3', name:'Hip thrust a una pierna', reps:'3 x 10 c/lado' },
+      { id:'c4', name:'Dead bug con resistencia', reps:'3 x 10 c/lado' },
+      { id:'c5', name:'Bici estática con intervalos suaves', reps:'15 min' },
+    ]},
   },
-  { // Fase 2: Estabilidad dinámica
-    A: [
-      {id:'a1', name:'Sentadilla a una pierna asistida (a caja)', reps:'3 x 8 c/lado'},
-      {id:'a2', name:'Peso muerto rumano a una pierna', reps:'3 x 8 c/lado'},
-      {id:'a3', name:'Zancada caminando (rango controlado)', reps:'3 x 10 pasos c/lado'},
-      {id:'a4', name:'Extensión de rodilla con banda (más resistencia)', reps:'3 x 15'},
-      {id:'a5', name:'Elevación de talones a una pierna', reps:'3 x 12 c/lado'},
-    ],
-    B: [
-      {id:'b1', name:'Step-down lateral (bajada controlada)', reps:'3 x 10 c/lado'},
-      {id:'b2', name:'Balance en superficie inestable (cojín/bosu)', reps:'3 x 30 seg c/lado'},
-      {id:'b3', name:'Band walks con más tensión', reps:'3 x 15 pasos c/lado'},
-      {id:'b4', name:'Plancha lateral', reps:'3 x 30 seg c/lado'},
-      {id:'b5', name:'Elevación de rodilla alterna controlada', reps:'3 x 10 c/lado'},
-    ],
-    C: [
-      {id:'c1', name:'Cambios de dirección lentos (caminando)', reps:'3 x 8 c/lado'},
-      {id:'c2', name:'Sentadilla goblet completa (si tolera)', reps:'3 x 12'},
-      {id:'c3', name:'Hip thrust a una pierna', reps:'3 x 10 c/lado'},
-      {id:'c4', name:'Dead bug con resistencia', reps:'3 x 10 c/lado'},
-      {id:'c5', name:'Bici estática con intervalos suaves', reps:'15 min'},
-    ],
-  },
-  { // Fase 3: Vuelta al juego
-    A: [
-      {id:'a1', name:'Saltos controlados a dos pies (caída suave)', reps:'3 x 8'},
-      {id:'a2', name:'Sentadilla con salto ligero (si no hay dolor)', reps:'3 x 8'},
-      {id:'a3', name:'Zancada dinámica con cambio de peso', reps:'3 x 10 c/lado'},
-      {id:'a4', name:'Extensión de rodilla con banda pesada', reps:'3 x 15'},
-      {id:'a5', name:'Elevación de talones con salto suave', reps:'3 x 12'},
-    ],
-    B: [
-      {id:'b1', name:'Saltos laterales controlados', reps:'3 x 8 c/lado'},
-      {id:'b2', name:'Cambios de dirección a velocidad media', reps:'3 x 6 c/lado'},
-      {id:'b3', name:'Balance dinámico (recibir y sostener)', reps:'3 x 10'},
-      {id:'b4', name:'Plancha con movimiento suave', reps:'3 x 20 seg'},
-      {id:'b5', name:'Carrera suave en línea recta', reps:'5-10 min'},
-    ],
-    C: [
-      {id:'c1', name:'Trote con cambios de ritmo', reps:'10 min'},
-      {id:'c2', name:'Saltos a un pie con aterrizaje controlado', reps:'3 x 6 c/lado'},
-      {id:'c3', name:'Ejercicios específicos del deporte (según tolerancia)', reps:'3 series'},
-      {id:'c4', name:'Core rotacional con banda (leñador)', reps:'3 x 10 c/lado'},
-      {id:'c5', name:'Enfriamiento y estiramiento', reps:'10 min'},
-    ],
+  { // Nivel 2: Vuelta al juego
+    name: 'Vuelta al juego',
+    A: { label: 'Rutina A — Vuelta al Juego', exercises: [
+      { id:'a1', name:'Saltos controlados a dos pies (caída suave)', reps:'3 x 8' },
+      { id:'a2', name:'Sentadilla con salto ligero (si no hay dolor)', reps:'3 x 8' },
+      { id:'a3', name:'Zancada dinámica con cambio de peso', reps:'3 x 10 c/lado' },
+      { id:'a4', name:'Extensión de rodilla con banda pesada', reps:'3 x 15' },
+      { id:'a5', name:'Elevación de talones con salto suave', reps:'3 x 12' },
+    ]},
+    B: { label: 'Rutina B — Vuelta al Juego', exercises: [
+      { id:'b1', name:'Saltos laterales controlados', reps:'3 x 8 c/lado' },
+      { id:'b2', name:'Cambios de dirección a velocidad media', reps:'3 x 6 c/lado' },
+      { id:'b3', name:'Balance dinámico (recibir y sostener)', reps:'3 x 10' },
+      { id:'b4', name:'Plancha con movimiento suave', reps:'3 x 20 seg' },
+      { id:'b5', name:'Carrera suave en línea recta', reps:'5-10 min' },
+    ]},
+    C: { label: 'Rutina C — Vuelta al Juego', exercises: [
+      { id:'c1', name:'Trote con cambios de ritmo', reps:'10 min' },
+      { id:'c2', name:'Saltos a un pie con aterrizaje controlado', reps:'3 x 6 c/lado' },
+      { id:'c3', name:'Ejercicios específicos del deporte (según tolerancia)', reps:'3 series' },
+      { id:'c4', name:'Core rotacional con banda (leñador)', reps:'3 x 10 c/lado' },
+      { id:'c5', name:'Enfriamiento y estiramiento', reps:'10 min' },
+    ]},
   },
 ];
+const MAX_LEVEL = ROUTINE_LEVELS.length - 1;
 
-const PHASE_NAMES = ['Movilidad','Fuerza','Estabilidad','Vuelta al Juego'];
-
-const CYCLE_TEMPLATES = [
-  {id:'movilidad', name:'Movilidad y control', weeks:3, phase:0, objetivo:'Recuperar el rango de movimiento completo sin dolor y reactivar el control muscular básico.'},
-  {id:'fuerza', name:'Fuerza base', weeks:4, phase:1, objetivo:'Construir fuerza real de cuádriceps, isquiotibiales y glúteo en rango seguro.'},
-  {id:'estabilidad', name:'Estabilidad dinámica', weeks:4, phase:2, objetivo:'Mejorar el equilibrio, el control neuromuscular y el trabajo a una pierna.'},
-  {id:'vuelta', name:'Vuelta al juego', weeks:4, phase:3, objetivo:'Reintroducir movimientos parecidos al deporte (cambios de dirección, saltos controlados) de forma progresiva.'},
+const LIMITS = [
+  'PROHIBIDO hacer sentadilla profunda o saltar si tu nivel actual no lo indica.',
+  'PROHIBIDO ignorar un dolor arriba de 5/10 — para y ajusta el ejercicio.',
+  'PROHIBIDO darte de alta tú mismo si hay hinchazón, chasquidos o inestabilidad.',
 ];
 
-function defaultData(){
-  return {
-    weightLog: [], painLog: [], workoutLog: [], mealChecks: {},
-    currentPhase: 2, checkedExercises: {}, exerciseLogs: {},
-    romLog: [], redFlags: [], cycles: [], activeCycle: null
-  };
-}
-function loadData(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
-    try{ return Object.assign(defaultData(), JSON.parse(raw)); }catch(e){}
-  }
-  return defaultData();
-}
-function saveData(d){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-}
+// Cada 4 semanas se revisa si el bloque cumplió su objetivo.
+const CHECKPOINT_WEEKS = [4, 8, 12, 16];
 
-let data = loadData();
-let currentDay = 'A';
-let editingDate = null;
-const todayStr = () => new Date().toISOString().slice(0,10);
-const activeDate = () => editingDate || todayStr();
+let state = { data: {}, week: 1, view: 'week', expanded: {} };
 
-document.getElementById('todayDate').textContent = new Date().toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
-
-// ---- Toast ----
-let toastTimer = null;
-function showToast(msg){
-  const slot = document.getElementById('toastSlot');
-  slot.innerHTML = `<div class="toast" id="activeToast">${msg}</div>`;
-  const el = document.getElementById('activeToast');
-  requestAnimationFrame(()=> el.classList.add('show'));
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>{
-    el.classList.remove('show');
-    setTimeout(()=>{ slot.innerHTML=''; }, 300);
-  }, 2200);
+function loadState() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) state.data = JSON.parse(raw); } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); showToast(); } catch(e) {}
+}
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1200);
 }
 
-// ---- Help modal ----
-document.getElementById('helpBtn').addEventListener('click', ()=>{
-  document.getElementById('helpModal').classList.add('show');
-});
-document.getElementById('closeHelpBtn').addEventListener('click', ()=>{
-  document.getElementById('helpModal').classList.remove('show');
-});
-document.getElementById('helpModal').addEventListener('click', (ev)=>{
-  if(ev.target.id === 'helpModal') document.getElementById('helpModal').classList.remove('show');
-});
-document.getElementById('cycleResultModal').addEventListener('click', (ev)=>{
-  if(ev.target.id === 'cycleResultModal') document.getElementById('cycleResultModal').classList.remove('show');
-});
+function dayKey(w, d) { return `w${w}_d${d}`; }
 
-// Reminder banner: after work hours (7am-6pm), so it shows from 7pm if nothing logged
-function renderReminder(){
-  const today = todayStr();
-  const hasWorkoutToday = data.workoutLog.some(w => w.date === today);
-  const slot = document.getElementById('reminderSlot');
-  const hour = new Date().getHours();
-  if(!hasWorkoutToday && hour >= 19){
-    slot.innerHTML = `<div class="reminder-banner">Todavía no registras entrenamiento hoy. Si te toca día de rutina, no olvides guardarlo abajo.</div>`;
-  } else {
-    slot.innerHTML = '';
-  }
+// ---- Reasignar tipo de día ----
+function getDayRoutineType(w, d) {
+  const override = state.data[`override_w${w}_d${d}`];
+  if (override) return override === 'REST' ? null : override;
+  return DEFAULT_DAY_MAP.hasOwnProperty(d) ? DEFAULT_DAY_MAP[d] : null;
+}
+function setDayOverride(w, d, val) {
+  const key = `override_w${w}_d${d}`;
+  if (val === 'DEFAULT') delete state.data[key];
+  else state.data[key] = val;
+  saveState();
+  render();
+}
+function moveTraining(w, fromD, toD) {
+  const type = getDayRoutineType(w, fromD);
+  if (!type) return;
+  state.data[`override_w${w}_d${fromD}`] = 'REST';
+  state.data[`override_w${w}_d${toD}`] = type;
+  state.expanded[dayKey(w, toD)] = true;
+  saveState();
+  render();
 }
 
-function renderEditBanner(){
-  const slot = document.getElementById('editBannerSlot');
-  if(editingDate){
-    slot.innerHTML = `<div class="edit-banner"><span>Editando el entrenamiento del ${editingDate}</span><button id="cancelEditBtn">Cancelar</button></div>`;
-    document.getElementById('cancelEditBtn').addEventListener('click', ()=>{
-      editingDate = null;
-      renderEditBanner();
-      renderExercises();
-      resetPainSliderForActiveDate();
-    });
-  } else {
-    slot.innerHTML = '';
-  }
+function toggleExercise(w, d, exId) {
+  const key = `${dayKey(w,d)}_ex_${exId}`;
+  state.data[key] = !state.data[key];
+  saveState();
+  render();
+}
+function toggleDayOpen(w, d) {
+  const k = dayKey(w,d);
+  state.expanded[k] = !state.expanded[k];
+  render();
+}
+function toggleFlag(w, d) {
+  const key = `${dayKey(w,d)}_flag`;
+  state.data[key] = !state.data[key];
+  saveState();
+  render();
+}
+function saveDayControl(w, d) {
+  const key = dayKey(w,d);
+  const painEl = document.getElementById(`pain_${key}`);
+  const romEl = document.getElementById(`rom_${key}`);
+  const pain = painEl.value === '' ? null : Number(painEl.value);
+  const rom = romEl.value === '' ? null : Number(romEl.value);
+  if (pain !== null) state.data[`${key}_pain`] = pain;
+  if (rom !== null) state.data[`${key}_rom`] = rom;
+  saveState();
+  render();
 }
 
-function resetPainSliderForActiveDate(){
-  const entry = data.painLog.find(p => p.date === activeDate());
-  painSlider.value = entry ? entry.pain : 3;
-  painSliderVal.textContent = painSlider.value;
+// ---- Fecha de inicio ----
+function markStartToday() {
+  state.data.startDate = new Date().toISOString().slice(0,10);
+  saveState(); render();
+}
+function changeStartDate() {
+  const current = state.data.startDate || new Date().toISOString().slice(0,10);
+  const nv = prompt('Fecha de inicio de tu proceso (AAAA-MM-DD):', current);
+  if (!nv) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(nv)) { alert('Formato inválido. Usa AAAA-MM-DD.'); return; }
+  state.data.startDate = nv;
+  saveState(); render();
+}
+function clearStartDate() {
+  if (!confirm('¿Borrar la fecha de inicio? Vuelve a quedar sin marcar.')) return;
+  delete state.data.startDate;
+  saveState(); render();
+}
+function weeksSinceStart() {
+  if (!state.data.startDate) return null;
+  const diffMs = new Date() - new Date(state.data.startDate);
+  return Math.max(1, Math.floor(diffMs / (7*24*60*60*1000)) + 1);
 }
 
-function goToRutinaTab(){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelector('.tab[data-view="rutina"]').classList.add('active');
-  document.getElementById('view-rutina').classList.add('active');
+// ---- Checkpoint (c2 automático según banderas rojas) ----
+function autoNoFlags(w) {
+  const start = Math.max(1, w-1);
+  for (let ww = start; ww <= w; ww++)
+    for (let d = 0; d < 6; d++)
+      if (state.data[`${dayKey(ww,d)}_flag`]) return false;
+  return true;
 }
-
-// Tabs
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('view-'+tab.dataset.view).classList.add('active');
-    if(tab.dataset.view === 'progreso'){ renderCharts(); renderSummaries(); renderHistory(); renderWeightList(); }
-    if(tab.dataset.view === 'clinico'){ renderRomChart(); renderRomList(); renderFlags(); }
-    if(tab.dataset.view === 'ciclos'){ renderCiclos(); renderCalendar(); renderPhaseSuggestionOnCiclosTab(); }
+function toggleCheckpoint(w, id) {
+  const key = `cp_w${w}_${id}`;
+  state.data[key] = !state.data[key];
+  saveState(); render();
+}
+function checkpointStatus(w) {
+  const c1 = !!state.data[`cp_w${w}_c1`];
+  const c2 = autoNoFlags(w);
+  const c3 = !!state.data[`cp_w${w}_c3`];
+  return { c1, c2, c3, allMet: c1 && c2 && c3, anyMarked: c1 || c3 };
+}
+function currentLevel(w) {
+  let level = 0;
+  CHECKPOINT_WEEKS.forEach(cw => {
+    if (w > cw && level < MAX_LEVEL) {
+      if (checkpointStatus(cw).allMet) level++;
+    }
   });
-});
+  return level;
+}
 
-// ---- Phase (driven by active/last cycle, read-only pitch) ----
-function renderCycleCard(){
-  const card = document.getElementById('cycleSummaryCard');
-  const c = data.activeCycle;
-  if(!c){
-    card.innerHTML = `
-      <div class="cap">Tu ciclo</div>
-      <div class="cc-empty">No tienes un ciclo activo ahorita. Un ciclo es un bloque de varias semanas enfocado en un solo objetivo (movilidad, fuerza, estabilidad o volver a jugar).</div>
-      <span class="cc-cta">Elegir un ciclo →</span>
-    `;
-    card.onclick = ()=> document.querySelector('.tab[data-view="ciclos"]').click();
-    return;
+// ---- Scoring ----
+function weekScore(w) {
+  let total = 0, done = 0;
+  const level = currentLevel(w);
+  for (let d = 0; d < 6; d++) {
+    const type = getDayRoutineType(w, d);
+    if (!type) continue;
+    const routine = ROUTINE_LEVELS[level][type];
+    total += routine.exercises.length;
+    routine.exercises.forEach(ex => { if (state.data[`${dayKey(w,d)}_ex_${ex.id}`]) done++; });
   }
-  const elapsed = Math.max(daysBetween(c.startDate, todayStr()), 0);
-  const total = daysBetween(c.startDate, c.plannedEndDate) || 1;
-  const pct = Math.min(100, Math.round((elapsed/total)*100));
-  card.innerHTML = `
-    <div class="cap">Tu ciclo · Fase: ${PHASE_NAMES[c.phase]}</div>
-    <div class="cc-name">${c.name}</div>
-    <div class="cc-obj">${c.objetivo}</div>
-    <div class="cc-meta">Día ${elapsed} de ${total} · termina ${c.plannedEndDate}</div>
-    <div class="progress-bar"><div class="fill" style="width:${pct}%;"></div></div>
-    <span class="cc-cta">Ver detalle en Ciclos →</span>
+  return { done, total, pct: total ? Math.round((done/total)*100) : 0 };
+}
+function overallScore() {
+  let td = 0, ta = 0;
+  for (let w = 1; w <= WEEKS_TOTAL; w++) { const s = weekScore(w); td += s.done; ta += s.total; }
+  return ta ? Math.round((td/ta)*100) : 0;
+}
+function weekAvgPain(w) {
+  const vals = [];
+  for (let d = 0; d < 6; d++) {
+    const p = state.data[`${dayKey(w,d)}_pain`];
+    if (p !== undefined && p !== null) vals.push(p);
+  }
+  if (vals.length === 0) return null;
+  return (vals.reduce((a,b)=>a+b,0) / vals.length).toFixed(1);
+}
+
+function pctColor(p) { if (p >= 80) return '#22c55e'; if (p >= 50) return '#f59e0b'; return '#ef4444'; }
+function pctLabel(p) {
+  if (p >= 90) return 'Constancia de atleta 🔥';
+  if (p >= 70) return 'Avanzando bien 💪';
+  if (p >= 50) return 'En progreso — sube el ritmo ⚡';
+  return 'Área de mejora — sin excusas ⚠️';
+}
+function painBadgeClass(pain) {
+  if (pain === undefined || pain === null) return null;
+  if (pain <= 3) return 'ok';
+  if (pain <= 6) return 'mid';
+  return 'high';
+}
+
+function renderStartBanner() {
+  if (!state.data.startDate) {
+    return `<div class="start-banner"><span>📅 Aún no marcas el inicio de tu proceso de recuperación.</span><button onclick="markStartToday()">Marcar hoy</button></div>`;
+  }
+  const weeks = weeksSinceStart();
+  return `<div class="start-banner">
+    <span>📅 Iniciaste el <b>${state.data.startDate}</b> — llevas ~${weeks} semana${weeks===1?'':'s'}</span>
+    <span style="display:flex; gap:10px; flex-shrink:0;">
+      <span class="link" onclick="changeStartDate()">cambiar</span>
+      <span class="link" onclick="clearStartDate()">borrar</span>
+    </span>
+  </div>`;
+}
+
+function render() {
+  const ws = weekScore(state.week);
+  const overall = overallScore();
+
+  let html = `
+  <div class="header">
+    <div class="header-eyebrow">Plan de recuperación</div>
+    <div class="header-title">⚽ REGRESO AL JUEGO</div>
+    <div class="header-stats">
+      <div class="stat-box"><div class="stat-val" style="color:${pctColor(ws.pct)}">${ws.pct}%</div><div class="stat-lbl">Esta semana</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${pctColor(overall)}">${overall}%</div><div class="stat-lbl">Todo el plan</div></div>
+    </div>
+    <div class="header-status" style="color:${pctColor(ws.pct)}">${pctLabel(ws.pct)}</div>
+  </div>
+
+  ${renderStartBanner()}
+
+  <div class="week-nav">
+    <button class="week-btn" onclick="changeWeek(-1)">◀</button>
+    <div class="week-info">
+      <div class="week-title">Semana ${state.week} de ${WEEKS_TOTAL}</div>
+      <div class="week-sub">${ws.done}/${ws.total} ejercicios</div>
+    </div>
+    <button class="week-btn" onclick="changeWeek(1)">▶</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn ${state.view==='week'?'active':'inactive'}" onclick="setView('week')">📅 Semana</button>
+    <button class="tab-btn ${state.view==='review'?'active':'inactive'}" onclick="setView('review')">📊 Revisión Dominical</button>
+  </div>
+
+  <div class="content">
   `;
-  card.onclick = ()=> document.querySelector('.tab[data-view="ciclos"]').click();
+
+  html += state.view === 'week' ? renderWeekView() : renderReviewView(ws);
+
+  html += `</div>`;
+  document.getElementById('app').innerHTML = html;
 }
 
-function last14PainAvg(){
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
-  const recent = data.painLog.filter(p => new Date(p.date) >= cutoff);
-  if(recent.length === 0) return null;
-  return recent.reduce((a,b)=>a+b.pain,0)/recent.length;
-}
-function last14Flags(){
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
-  return data.redFlags.filter(f => new Date(f.date) >= cutoff).length;
-}
-function last14Workouts(){
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
-  return data.workoutLog.filter(w => new Date(w.date) >= cutoff && w.exercisesDone > 0).length;
-}
+function renderCheckpointCard(w) {
+  const status = checkpointStatus(w);
+  let h = `<div class="checkpoint-card">
+    <div class="checkpoint-eyebrow">Revisión de bloque · Semana ${w}</div>
+    <div class="checkpoint-goal">🎯 Meta de este bloque: fortalecer tu rodilla en fuerza y estabilidad</div>
 
-function renderPhaseSuggestionOnCiclosTab(){
-  const slot = document.getElementById('phaseSuggestionSlot');
-  if(!slot) return;
-  slot.innerHTML = '';
-  if(!data.activeCycle) return;
-  const avgPain = last14PainAvg();
-  const flags = last14Flags();
-  const workouts = last14Workouts();
-  const meetsCriteria = avgPain !== null && avgPain <= 3 && flags === 0 && workouts >= 4;
-  if(meetsCriteria){
-    slot.innerHTML = `<div class="phase-suggestion"><span>Cumples los criterios de las últimas 2 semanas — puedes cerrar este ciclo.</span><button id="advancePhaseBtn">Cerrar ciclo</button></div>`;
-    document.getElementById('advancePhaseBtn').addEventListener('click', ()=>{
-      if(confirm('¿Cerrar el ciclo actual y ver tus resultados?')) closeCycle();
-    });
-  }
-}
-function renderPhase(){
-  renderCycleCard();
-}
+    <div class="checkpoint-item" onclick="toggleCheckpoint(${w},'c1')">
+      <div class="checkpoint-check ${status.c1?'done':''}">${status.c1?'✓':''}</div>
+      <div class="checkpoint-text">Dolor consistente en 3/10 o menos durante y después de entrenar.</div>
+    </div>
+    <div class="checkpoint-item auto">
+      <div class="checkpoint-check ${status.c2?'done':'fail'}">${status.c2?'✓':'✕'}</div>
+      <div class="checkpoint-text">Cero hinchazón o chasquidos en las últimas 1-2 semanas.<small>Automático, según tus banderas 🚩 marcadas en los días.</small></div>
+    </div>
+    <div class="checkpoint-item" onclick="toggleCheckpoint(${w},'c3')">
+      <div class="checkpoint-check ${status.c3?'done':''}">${status.c3?'✓':''}</div>
+      <div class="checkpoint-text">Completas todas las series y repeticiones sin compensar con la otra pierna.</div>
+    </div>`;
 
-// ---- Day select / exercises ----
-document.querySelectorAll('#daySelect button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('#daySelect button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    currentDay = btn.dataset.day;
-    renderExercises();
-  });
-});
-
-function renderExercises(){
-  const list = document.getElementById('exerciseList');
-  list.innerHTML = '';
-  const dateKey = activeDate();
-  const todayKey = dateKey+'_'+currentDay;
-  const savedLog = data.exerciseLogs[todayKey];
-
-  // If this date/day was already logged, edit from the saved snapshot (correct even if phase changed later).
-  // Otherwise, use the current phase's template for a fresh entry.
-  let exList;
-  if(savedLog){
-    exList = Object.keys(savedLog).map(id => ({
-      id, name: savedLog[id].name, reps: savedLog[id].targetReps
-    }));
+  if (status.allMet) {
+    h += `<div class="checkpoint-result ok">✅ Objetivo cumplido — tu rutina sube de nivel automáticamente a partir de la próxima semana.</div>`;
+  } else if (status.anyMarked) {
+    h += `<div class="checkpoint-result pending">⚠️ Aún no cumples los 3 — repite este bloque 2 semanas más y vuelve a revisar.</div>`;
   } else {
-    exList = EXERCISES_BY_PHASE[data.currentPhase][currentDay];
+    h += `<div class="checkpoint-result pending">⚠️ Revisa los criterios de arriba con honestidad antes de subir de nivel.</div>`;
   }
+  h += `</div>`;
+  return h;
+}
 
-  exList.forEach(ex=>{
-    const prev = (savedLog && savedLog[ex.id]) || {done:false, weight:'', reps:'', rpe:''};
-    const row = document.createElement('div');
-    row.className = 'exercise' + (prev.done ? ' done' : '');
-    row.innerHTML = `
-      <div class="top-row">
-        <input type="checkbox" data-id="${ex.id}" class="doneCheck" ${prev.done ? 'checked' : ''}>
-        <div>
-          <div class="name">${ex.name}</div>
-          <div class="reps">${ex.reps}</div>
+function renderWeekView() {
+  let h = '';
+  const w = state.week;
+  const level = currentLevel(w);
+
+  if (CHECKPOINT_WEEKS.includes(w)) h += renderCheckpointCard(w);
+
+  h += `<div class="level-badge">Nivel actual: ${ROUTINE_LEVELS[level].name}</div>`;
+  h += sectionTitle('📅', 'Tu Semana', 'Toca un día para abrir su carpeta');
+
+  for (let d = 0; d < 6; d++) {
+    const key = dayKey(w, d);
+    const isOpen = !!state.expanded[key];
+    const type = getDayRoutineType(w, d);
+    const routine = type ? ROUTINE_LEVELS[level][type] : null;
+    const overrideVal = state.data[`override_w${w}_d${d}`] || 'DEFAULT';
+
+    let doneCount = 0, totalCount = 0;
+    if (routine) {
+      totalCount = routine.exercises.length;
+      routine.exercises.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) doneCount++; });
+    }
+    const pain = state.data[`${key}_pain`];
+    const flagged = !!state.data[`${key}_flag`];
+    const painClass = painBadgeClass(pain);
+
+    let badges = '';
+    if (routine) badges += `<span class="badge ${doneCount===totalCount && totalCount>0 ? 'ok':'mid'}">${doneCount}/${totalCount}</span>`;
+    if (painClass) badges += `<span class="badge ${painClass}">Dolor ${pain}</span>`;
+    if (flagged) badges += `<span class="badge high">🚩</span>`;
+
+    h += `<div class="day-folder">
+      <div class="day-folder-header" onclick="toggleDayOpen(${w},${d})">
+        <span class="day-folder-icon">${routine ? '🦵' : '🛌'}</span>
+        <div class="day-folder-body">
+          <div class="day-folder-name">${DAY_NAMES[d]}</div>
+          <div class="day-folder-sub">${routine ? routine.label : 'Descanso'}</div>
         </div>
+        <div class="day-folder-badges">${badges}</div>
+        <span class="chevron ${isOpen?'open':''}">▶</span>
       </div>
-      <div class="fields">
-        <div class="field"><label>Peso (kg)</label><input type="number" class="fWeight" value="${prev.weight}"></div>
-        <div class="field"><label>Reps hechas</label><input type="number" class="fReps" value="${prev.reps}"></div>
-        <div class="field"><label>RPE (1-10)</label><input type="number" min="1" max="10" class="fRpe" value="${prev.rpe}"></div>
-      </div>
-    `;
-    row.dataset.name = ex.name;
-    row.dataset.targetReps = ex.reps;
-    row.dataset.exId = ex.id;
-    const cb = row.querySelector('.doneCheck');
-    cb.addEventListener('change', ()=> row.classList.toggle('done', cb.checked));
-    list.appendChild(row);
-  });
-  resetPainSliderForActiveDate();
-}
+      <div class="day-folder-content ${isOpen?'open':''}">
+        ${routine ? `<div class="day-type-row">
+          <label>¿No pudiste hoy? Mueve esta rutina a otro día</label>
+          <select onchange="if(this.value!=='') moveTraining(${w},${d},Number(this.value)); this.selectedIndex=0;">
+            <option value="">Mover a...</option>
+            ${DAY_NAMES.map((name,dd)=> dd!==d ? `<option value="${dd}">${name}</option>` : '').join('')}
+          </select>
+        </div>` : ''}
+        <div class="day-type-row">
+          <label>Tipo de día (por si cambias tu semana)</label>
+          <select onchange="setDayOverride(${w},${d},this.value)">
+            <option value="DEFAULT" ${overrideVal==='DEFAULT'?'selected':''}>Normal (según tu programación)</option>
+            <option value="REST" ${overrideVal==='REST'?'selected':''}>Descanso</option>
+            <option value="A" ${overrideVal==='A'?'selected':''}>Rutina A</option>
+            <option value="B" ${overrideVal==='B'?'selected':''}>Rutina B</option>
+            <option value="C" ${overrideVal==='C'?'selected':''}>Rutina C</option>
+          </select>
+        </div>`;
 
-// ---- Pain slider ----
-const painSlider = document.getElementById('painSlider');
-const painSliderVal = document.getElementById('painSliderVal');
-painSlider.addEventListener('input', ()=>{ painSliderVal.textContent = painSlider.value; });
-
-// ---- Save workout ----
-document.getElementById('saveWorkoutBtn').addEventListener('click', ()=>{
-  const dateKey = activeDate();
-  const pain = Number(painSlider.value);
-  const todayKey = dateKey+'_'+currentDay;
-
-  const rows = document.querySelectorAll('#exerciseList .exercise');
-  const log = {};
-  let doneCount = 0;
-  rows.forEach(row=>{
-    const id = row.dataset.exId;
-    const done = row.querySelector('.doneCheck').checked;
-    const weight = row.querySelector('.fWeight').value;
-    const reps = row.querySelector('.fReps').value;
-    const rpe = row.querySelector('.fRpe').value;
-    log[id] = {done, weight, reps, rpe, name: row.dataset.name, targetReps: row.dataset.targetReps};
-    if(done) doneCount++;
-  });
-  data.exerciseLogs[todayKey] = log;
-
-  data.workoutLog = data.workoutLog.filter(w => w.date !== dateKey);
-  data.workoutLog.push({date: dateKey, day: currentDay, exercisesDone: doneCount, exercisesTotal: rows.length});
-
-  data.painLog = data.painLog.filter(p => p.date !== dateKey);
-  data.painLog.push({date: dateKey, pain: pain});
-
-  saveData(data);
-  renderScoreboard();
-  renderReminder();
-  renderPhase();
-
-  const wasEditing = !!editingDate;
-  editingDate = null;
-  renderEditBanner();
-  showToast(wasEditing ? '✓ Entrenamiento del '+dateKey+' actualizado' : '✓ Entrenamiento guardado');
-  renderExercises();
-});
-
-// ---- Weight ----
-document.getElementById('saveWeightBtn').addEventListener('click', ()=>{
-  const val = parseFloat(document.getElementById('weightInput').value);
-  if(!val || val <= 0) return;
-  const today = todayStr();
-  data.weightLog = data.weightLog.filter(w => w.date !== today);
-  data.weightLog.push({date: today, weight: val});
-  saveData(data);
-  document.getElementById('weightInput').value = '';
-  renderScoreboard();
-  renderCharts();
-  renderHistory();
-  renderSummaries();
-  renderWeightList();
-  showToast('✓ Peso guardado');
-});
-
-function renderWeightList(){
-  const list = document.getElementById('weightList');
-  list.innerHTML = '';
-  const sorted = [...data.weightLog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,15);
-  if(sorted.length === 0){ list.innerHTML = '<div class="empty">Sin registros de peso.</div>'; return; }
-  sorted.forEach(w=>{
-    const row = document.createElement('div');
-    row.className = 'simple-list-row';
-    row.innerHTML = `<span>${w.date}</span><span class="v">${w.weight} kg</span><div class="row-actions"><button class="accent" data-a="edit">✎</button><button class="danger" data-a="del">🗑</button></div>`;
-    row.querySelector('[data-a="edit"]').addEventListener('click', ()=>{
-      const nv = prompt('Nuevo peso (kg) para '+w.date, w.weight);
-      if(nv === null) return;
-      const num = parseFloat(nv);
-      if(!num || num<=0) return;
-      w.weight = num;
-      saveData(data);
-      renderWeightList(); renderCharts(); renderScoreboard(); renderSummaries();
-    });
-    row.querySelector('[data-a="del"]').addEventListener('click', ()=>{
-      if(!confirm('¿Borrar el registro de peso del '+w.date+'?')) return;
-      data.weightLog = data.weightLog.filter(x => x !== w);
-      saveData(data);
-      renderWeightList(); renderCharts(); renderScoreboard(); renderSummaries();
-    });
-    list.appendChild(row);
-  });
-}
-
-// ---- Meals ----
-document.querySelectorAll('.mealCheck').forEach(cb=>{
-  const today = todayStr();
-  if(!data.mealChecks[today]) data.mealChecks[today] = {};
-  cb.checked = !!data.mealChecks[today][cb.dataset.meal];
-  cb.addEventListener('change', ()=>{
-    if(!data.mealChecks[today]) data.mealChecks[today] = {};
-    data.mealChecks[today][cb.dataset.meal] = cb.checked;
-    saveData(data);
-  });
-});
-
-// ---- ROM ----
-document.getElementById('saveRomBtn').addEventListener('click', ()=>{
-  const knee = document.getElementById('romKnee').value;
-  const degrees = parseFloat(document.getElementById('romDegrees').value);
-  if(!degrees) return;
-  data.romLog.push({date: todayStr(), knee, degrees});
-  saveData(data);
-  document.getElementById('romDegrees').value = '';
-  renderRomChart();
-  renderRomList();
-  showToast('✓ ROM guardado');
-});
-
-function renderRomChart(){
-  const sorted = [...data.romLog].filter(r=>r.knee==='izquierda').sort((a,b)=>a.date.localeCompare(b.date));
-  const vals = sorted.map(r=>r.degrees);
-  buildSparkline(document.getElementById('romChart'), vals, '#6FA07A',
-    vals.length ? Math.min(...vals)-5 : 0, vals.length ? Math.max(...vals)+5 : 140);
-}
-
-function renderRomList(){
-  const list = document.getElementById('romList');
-  list.innerHTML = '';
-  const sorted = [...data.romLog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,15);
-  if(sorted.length === 0){ list.innerHTML = '<div class="empty">Sin registros de ROM.</div>'; return; }
-  sorted.forEach(r=>{
-    const row = document.createElement('div');
-    row.className = 'simple-list-row';
-    row.innerHTML = `<span>${r.date} · ${r.knee}</span><span class="v">${r.degrees}°</span><div class="row-actions"><button class="accent" data-a="edit">✎</button><button class="danger" data-a="del">🗑</button></div>`;
-    row.querySelector('[data-a="edit"]').addEventListener('click', ()=>{
-      const nv = prompt('Nuevos grados de flexión ('+r.knee+', '+r.date+')', r.degrees);
-      if(nv === null) return;
-      const num = parseFloat(nv);
-      if(!num) return;
-      r.degrees = num;
-      saveData(data);
-      renderRomList(); renderRomChart();
-    });
-    row.querySelector('[data-a="del"]').addEventListener('click', ()=>{
-      if(!confirm('¿Borrar este registro de ROM?')) return;
-      data.romLog = data.romLog.filter(x => x !== r);
-      saveData(data);
-      renderRomList(); renderRomChart();
-    });
-    list.appendChild(row);
-  });
-}
-
-// ---- Red flags ----
-document.getElementById('saveFlagBtn').addEventListener('click', ()=>{
-  const type = document.getElementById('flagType').value;
-  const note = document.getElementById('flagNote').value.trim();
-  data.redFlags.push({date: todayStr(), type, note});
-  saveData(data);
-  document.getElementById('flagNote').value = '';
-  renderFlags();
-  renderPhase();
-  showToast('✓ Bandera registrada');
-});
-
-function renderFlags(){
-  const list = document.getElementById('flagsList');
-  list.innerHTML = '';
-  const sorted = [...data.redFlags].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,15);
-  if(sorted.length === 0){
-    list.innerHTML = '<div class="empty">Sin banderas rojas registradas.</div>';
-    return;
-  }
-  sorted.forEach(f=>{
-    const row = document.createElement('div');
-    row.className = 'flag-row';
-    row.innerHTML = `<div class="meta">${f.date} · ${f.type}</div>${f.note ? f.note : ''}
-      <div class="row-actions">
-        <button data-a="edit">Editar nota</button>
-        <button class="danger" data-a="del">Borrar</button>
-      </div>`;
-    row.querySelector('[data-a="edit"]').addEventListener('click', ()=>{
-      const nv = prompt('Editar nota de la bandera ('+f.date+', '+f.type+')', f.note || '');
-      if(nv === null) return;
-      f.note = nv.trim();
-      saveData(data);
-      renderFlags();
-    });
-    row.querySelector('[data-a="del"]').addEventListener('click', ()=>{
-      if(!confirm('¿Borrar esta bandera roja?')) return;
-      data.redFlags = data.redFlags.filter(x => x !== f);
-      saveData(data);
-      renderFlags();
-      renderPhase();
-    });
-    list.appendChild(row);
-  });
-}
-
-// ---- Streak / scoreboard ----
-function computeStreak(){
-  let streak = 0;
-  let d = new Date();
-  while(true){
-    const key = d.toISOString().slice(0,10);
-    const has = data.workoutLog.some(w => w.date === key && w.exercisesDone > 0);
-    if(has){ streak++; d.setDate(d.getDate()-1); } else { break; }
-  }
-  return streak;
-}
-
-function renderScoreboard(){
-  document.getElementById('streakNum').textContent = computeStreak();
-  const lastWeight = data.weightLog.length ? [...data.weightLog].sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0].weight : '78';
-  document.getElementById('weightNum').textContent = lastWeight;
-
-  const today = todayStr();
-  const todayPain = data.painLog.find(p => p.date === today);
-  const painStat = document.getElementById('painStat');
-  const painNum = document.getElementById('painNum');
-  painStat.classList.remove('pain-ok','pain-mid','pain-high');
-  if(todayPain){
-    painNum.textContent = todayPain.pain;
-    if(todayPain.pain <= 3) painStat.classList.add('pain-ok');
-    else if(todayPain.pain <= 6) painStat.classList.add('pain-mid');
-    else painStat.classList.add('pain-high');
-  } else {
-    painNum.textContent = '-';
-  }
-}
-
-// ---- History (with detail, edit, delete) ----
-function renderHistory(){
-  const list = document.getElementById('historyList');
-  list.innerHTML = '';
-  const sorted = [...data.workoutLog].sort((a,b)=> b.date.localeCompare(a.date)).slice(0,15);
-  if(sorted.length === 0){
-    list.innerHTML = '<div class="empty">Aún no hay entrenamientos guardados.</div>';
-    return;
-  }
-  sorted.forEach(w=>{
-    const row = document.createElement('div');
-    row.className = 'history-row';
-    const key = w.date+'_'+w.day;
-    const log = data.exerciseLogs[key] || {};
-    const painEntry = data.painLog.find(p=>p.date===w.date);
-    let detailHtml = '';
-    Object.values(log).forEach(e=>{
-      if(e.done){
-        detailHtml += `<div class="ex-line">• ${e.name}: ${e.weight || '-'}kg x ${e.reps || '-'} reps, RPE ${e.rpe || '-'}</div>`;
-      }
-    });
-    if(!detailHtml) detailHtml = '<div class="ex-line">Sin ejercicios marcados como hechos.</div>';
-    if(painEntry) detailHtml += `<div class="ex-line">Dolor ese día: ${painEntry.pain}/10</div>`;
-
-    row.innerHTML = `
-      <div class="h-top">
-        <span>${w.date} · Día ${w.day}</span>
-        <span class="v">${w.exercisesDone}/${w.exercisesTotal} ejercicios</span>
-      </div>
-      <div class="h-detail">${detailHtml}
-        <div class="h-actions">
-          <div class="icon-btn accent" data-a="edit">Editar</div>
-          <div class="icon-btn danger" data-a="del">Borrar</div>
-        </div>
-      </div>
-    `;
-    const detailEl = row.querySelector('.h-detail');
-    row.querySelector('.h-top').addEventListener('click', ()=> detailEl.classList.toggle('open'));
-    row.querySelector('[data-a="edit"]').addEventListener('click', (ev)=>{
-      ev.stopPropagation();
-      editingDate = w.date;
-      currentDay = w.day;
-      document.querySelectorAll('#daySelect button').forEach(b=> b.classList.toggle('active', b.dataset.day===currentDay));
-      goToRutinaTab();
-      renderEditBanner();
-      renderExercises();
-    });
-    row.querySelector('[data-a="del"]').addEventListener('click', (ev)=>{
-      ev.stopPropagation();
-      if(!confirm('¿Borrar el entrenamiento del '+w.date+'?')) return;
-      data.workoutLog = data.workoutLog.filter(x => x !== w);
-      delete data.exerciseLogs[key];
-      data.painLog = data.painLog.filter(p => p.date !== w.date);
-      saveData(data);
-      renderHistory(); renderScoreboard(); renderCharts(); renderSummaries(); renderPhase();
-      if(document.getElementById('view-ciclos').classList.contains('active')) renderCalendar();
-    });
-    list.appendChild(row);
-  });
-}
-
-// ---- Summaries ----
-function summarizeRange(days){
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-days);
-  const workouts = data.workoutLog.filter(w => new Date(w.date) >= cutoff && w.exercisesDone > 0).length;
-  const pains = data.painLog.filter(p => new Date(p.date) >= cutoff).map(p=>p.pain);
-  const avgPain = pains.length ? (pains.reduce((a,b)=>a+b,0)/pains.length).toFixed(1) : '-';
-  const weightsInRange = [...data.weightLog].filter(w => new Date(w.date) >= cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  let weightChange = '-';
-  if(weightsInRange.length >= 2){
-    const diff = weightsInRange[weightsInRange.length-1].weight - weightsInRange[0].weight;
-    weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' kg';
-  }
-  const flags = data.redFlags.filter(f => new Date(f.date) >= cutoff).length;
-  return {workouts, avgPain, weightChange, flags};
-}
-
-function renderSummaries(){
-  const s7 = summarizeRange(7);
-  document.getElementById('sum7Workouts').textContent = s7.workouts;
-  document.getElementById('sum7Pain').textContent = s7.avgPain;
-  document.getElementById('sum7Weight').textContent = s7.weightChange;
-  document.getElementById('sum7Flags').textContent = s7.flags;
-
-  const s30 = summarizeRange(30);
-  document.getElementById('sum30Workouts').textContent = s30.workouts;
-  document.getElementById('sum30Pain').textContent = s30.avgPain;
-  document.getElementById('sum30Weight').textContent = s30.weightChange;
-  document.getElementById('sum30Flags').textContent = s30.flags;
-}
-
-// ---- Charts ----
-function buildSparkline(svgEl, points, color, minY, maxY){
-  svgEl.innerHTML = '';
-  if(points.length < 2){
-    svgEl.innerHTML = `<text x="150" y="50" fill="#8FA396" font-size="10" text-anchor="middle">Necesitas al menos 2 registros para ver la gráfica</text>`;
-    return;
-  }
-  const w = 300, h = 100, pad = 8;
-  const xs = points.map((_,i)=> pad + (i/(points.length-1)) * (w-pad*2));
-  const range = (maxY - minY) || 1;
-  const ys = points.map(p => h - pad - ((p - minY)/range) * (h-pad*2));
-  const path = xs.map((x,i)=> `${i===0?'M':'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
-  const ns = 'http://www.w3.org/2000/svg';
-  const pathEl = document.createElementNS(ns,'path');
-  pathEl.setAttribute('d', path);
-  pathEl.setAttribute('fill','none');
-  pathEl.setAttribute('stroke', color);
-  pathEl.setAttribute('stroke-width','2');
-  svgEl.appendChild(pathEl);
-  xs.forEach((x,i)=>{
-    const c = document.createElementNS(ns,'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', ys[i]); c.setAttribute('r','2.5');
-    c.setAttribute('fill', color);
-    svgEl.appendChild(c);
-  });
-}
-
-function renderCharts(){
-  const wSorted = [...data.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
-  const wVals = wSorted.map(w=>w.weight);
-  buildSparkline(document.getElementById('weightChart'), wVals, '#6FA0C2',
-    wVals.length ? Math.min(...wVals)-1 : 0, wVals.length ? Math.max(...wVals)+1 : 100);
-
-  const pSorted = [...data.painLog].sort((a,b)=>a.date.localeCompare(b.date));
-  const pVals = pSorted.map(p=>p.pain);
-  buildSparkline(document.getElementById('painChart'), pVals, '#E2A63B', 0, 10);
-}
-
-// ---- Export report (.txt) ----
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-30);
-  let txt = 'REGRESO AL JUEGO — Reporte de los últimos 30 días\n';
-  txt += 'Generado: ' + new Date().toLocaleString('es-MX') + '\n';
-  txt += '===========================================\n\n';
-
-  txt += '-- ENTRENAMIENTOS --\n';
-  const workouts = [...data.workoutLog].filter(w=>new Date(w.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  if(workouts.length === 0) txt += 'Sin registros.\n';
-  workouts.forEach(w=>{
-    txt += `${w.date} - Día ${w.day} - ${w.exercisesDone}/${w.exercisesTotal} ejercicios completados\n`;
-    const key = w.date+'_'+w.day;
-    const log = data.exerciseLogs[key];
-    if(log){
-      Object.values(log).forEach(e=>{
-        if(e.done){
-          txt += `    • ${e.name}: ${e.weight || '-'}kg x ${e.reps || '-'} reps, RPE ${e.rpe || '-'}\n`;
-        }
+    if (routine) {
+      routine.exercises.forEach(ex => {
+        const done = !!state.data[`${key}_ex_${ex.id}`];
+        const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' técnica correcta ejercicio')}`;
+        h += `<div class="exercise-row">
+          <div class="exercise-check ${done?'done':''}" onclick="toggleExercise(${w},${d},'${ex.id}')">${done?'✓':''}</div>
+          <div>
+            <div class="exercise-name">${ex.name}</div>
+            <div class="exercise-reps">${ex.reps}</div>
+            <a class="exercise-video" href="${videoUrl}" target="_blank" rel="noopener">▶ Ver técnica</a>
+          </div>
+        </div>`;
       });
+    } else {
+      h += `<div class="rest-note">Día de descanso. Si quieres, anota abajo cómo sientes la rodilla.</div>`;
     }
-  });
 
-  txt += '\n-- DOLOR DIARIO (0-10) --\n';
-  const pains = [...data.painLog].filter(p=>new Date(p.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  if(pains.length === 0) txt += 'Sin registros.\n';
-  pains.forEach(p=> txt += `${p.date}: ${p.pain}\n`);
+    h += `<button class="flag-toggle ${flagged?'on':''}" onclick="toggleFlag(${w},${d})">🚩 ${flagged ? 'Hinchazón/chasquido marcado hoy' : 'Marcar hinchazón o chasquido'}</button>`;
 
-  txt += '\n-- PESO (kg) --\n';
-  const weights = [...data.weightLog].filter(w=>new Date(w.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  if(weights.length === 0) txt += 'Sin registros.\n';
-  weights.forEach(w=> txt += `${w.date}: ${w.weight} kg\n`);
-
-  txt += '\n-- ROM (rango de movimiento) --\n';
-  const roms = [...data.romLog].filter(r=>new Date(r.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  if(roms.length === 0) txt += 'Sin registros.\n';
-  roms.forEach(r=> txt += `${r.date}: rodilla ${r.knee} - ${r.degrees}°\n`);
-
-  txt += '\n-- BANDERAS ROJAS --\n';
-  const flags = [...data.redFlags].filter(f=>new Date(f.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
-  if(flags.length === 0) txt += 'Sin registros.\n';
-  flags.forEach(f=> txt += `${f.date}: ${f.type}${f.note ? ' - '+f.note : ''}\n`);
-
-  downloadBlob(txt, 'text/plain', 'reporte_regreso_al_juego_' + todayStr() + '.txt');
-});
-
-function downloadBlob(content, mime, filename){
-  const blob = new Blob([content], {type:mime});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ---- Backup export / import ----
-document.getElementById('backupExportBtn').addEventListener('click', ()=>{
-  downloadBlob(JSON.stringify(data, null, 2), 'application/json', 'backup_regreso_al_juego_' + todayStr() + '.json');
-});
-document.getElementById('backupImportBtn').addEventListener('click', ()=>{
-  document.getElementById('importFileInput').click();
-});
-document.getElementById('importFileInput').addEventListener('change', (ev)=>{
-  const file = ev.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    try{
-      const parsed = JSON.parse(reader.result);
-      if(!confirm('Esto va a reemplazar todos tus datos actuales con los del archivo. ¿Continuar?')) return;
-      data = Object.assign(defaultData(), parsed);
-      saveData(data);
-      renderAll();
-      showToast('✓ Copia restaurada correctamente');
-    }catch(e){
-      alert('No se pudo leer el archivo. Asegúrate de que sea una copia de seguridad válida (.json).');
-    }
-    ev.target.value = '';
-  };
-  reader.readAsText(file);
-});
-
-// ---- Cycles ----
-function avgPainInRange(startDate, endDate){
-  const s = new Date(startDate), e = new Date(endDate);
-  const vals = data.painLog.filter(p=>{ const d=new Date(p.date); return d>=s && d<=e; }).map(p=>p.pain);
-  return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : null;
-}
-function lastRomBefore(dateStr){
-  const cutoff = new Date(dateStr);
-  const list = data.romLog.filter(r=>r.knee==='izquierda' && new Date(r.date) <= cutoff).sort((a,b)=>b.date.localeCompare(a.date));
-  return list.length ? list[0].degrees : null;
-}
-function lastRomInRangeOrBefore(startDate, endDate){
-  const s = new Date(startDate), e = new Date(endDate);
-  const inRange = data.romLog.filter(r=>r.knee==='izquierda' && new Date(r.date)>=s && new Date(r.date)<=e).sort((a,b)=>b.date.localeCompare(a.date));
-  if(inRange.length) return inRange[0].degrees;
-  return lastRomBefore(endDate);
-}
-function lastWeightBefore(dateStr){
-  const cutoff = new Date(dateStr);
-  const list = data.weightLog.filter(w=>new Date(w.date) <= cutoff).sort((a,b)=>b.date.localeCompare(a.date));
-  return list.length ? list[0].weight : null;
-}
-function workoutsInRange(startDate, endDate){
-  const s = new Date(startDate), e = new Date(endDate);
-  return data.workoutLog.filter(w=>{ const d=new Date(w.date); return d>=s && d<=e && w.exercisesDone>0; }).length;
-}
-function daysBetween(a,b){
-  return Math.round((new Date(b) - new Date(a)) / 86400000);
-}
-function addDays(dateStr, n){
-  const d = new Date(dateStr);
-  d.setDate(d.getDate()+n);
-  return d.toISOString().slice(0,10);
-}
-
-function startCycle(name, objetivo, weeks, phase){
-  const start = todayStr();
-  const end = addDays(start, Math.round(weeks*7));
-  const sevenBefore = addDays(start, -7);
-  data.activeCycle = {
-    id: Date.now(),
-    name, objetivo,
-    startDate: start,
-    plannedEndDate: end,
-    phase: phase,
-    startSnapshot: {
-      weight: lastWeightBefore(start),
-      avgPain: avgPainInRange(sevenBefore, start),
-      rom: lastRomBefore(start)
-    }
-  };
-  data.currentPhase = phase;
-  saveData(data);
-  renderCiclos();
-  renderPhase();
-}
-
-function closeCycle(){
-  const c = data.activeCycle;
-  if(!c) return;
-  const endDate = todayStr();
-  const endSnapshot = {
-    weight: lastWeightBefore(endDate),
-    avgPain: avgPainInRange(c.startDate, endDate),
-    rom: lastRomInRangeOrBefore(c.startDate, endDate)
-  };
-  const workouts = workoutsInRange(c.startDate, endDate);
-  const totalDays = daysBetween(c.startDate, endDate) || 1;
-  const flags = data.redFlags.filter(f => new Date(f.date) >= new Date(c.startDate) && new Date(f.date) <= new Date(endDate)).length;
-
-  const closed = { ...c, endDate, endSnapshot, workouts, totalDays, flags };
-  data.cycles.push(closed);
-  data.activeCycle = null;
-  saveData(data);
-  renderCiclos();
-  renderPhase();
-  showCycleResultModal(closed);
-}
-
-function showCycleResultModal(c){
-  const card = document.getElementById('cycleResultCard');
-  const painBefore = c.startSnapshot.avgPain !== null ? +c.startSnapshot.avgPain.toFixed(1) : null;
-  const painAfter = c.endSnapshot.avgPain !== null ? +c.endSnapshot.avgPain.toFixed(1) : null;
-  card.innerHTML = `
-    <h2>Resultados: ${c.name}</h2>
-    <div class="cc-obj" style="margin-top:4px;">${c.startDate} → ${c.endDate} (${c.totalDays} días)</div>
-    <div class="step"><div class="txt" style="width:100%;">
-      <b>Dolor promedio:</b> ${fmtDelta(painBefore, painAfter, '')}<br>
-      <b>Peso:</b> ${fmtDelta(c.startSnapshot.weight, c.endSnapshot.weight, 'kg')}<br>
-      <b>ROM rodilla izq:</b> ${fmtDelta(c.startSnapshot.rom, c.endSnapshot.rom, '°')}<br>
-      <b>Entrenamientos completados:</b> ${c.workouts} de ${c.totalDays} días<br>
-      <b>Banderas rojas durante el ciclo:</b> ${c.flags}
-    </div></div>
-    <button class="btn" id="closeCycleResultBtn">Elegir el siguiente ciclo</button>
-  `;
-  document.getElementById('cycleResultModal').classList.add('show');
-  document.getElementById('closeCycleResultBtn').addEventListener('click', ()=>{
-    document.getElementById('cycleResultModal').classList.remove('show');
-  });
-}
-
-function renderCiclos(){
-  const slot = document.getElementById('activeCycleSlot');
-  slot.innerHTML = '';
-
-  if(!data.activeCycle){
-    const wrap = document.createElement('div');
-    wrap.innerHTML = `
-      <div class="template-grid" id="templateGrid"></div>
-      <button class="btn secondary" id="customCycleToggle" style="margin-top:0;">Crear ciclo personalizado</button>
-      <div class="custom-cycle-form" id="customCycleForm" style="display:none; margin-top:10px;">
-        <input type="text" id="customName" placeholder="Nombre del ciclo">
-        <input type="text" id="customObjetivo" placeholder="Objetivo de este ciclo">
-        <input type="number" id="customWeeks" placeholder="Duración en semanas" value="4">
-        <select id="customPhase">
-          <option value="0">Fase: Movilidad</option>
-          <option value="1">Fase: Fuerza</option>
-          <option value="2" selected>Fase: Estabilidad</option>
-          <option value="3">Fase: Vuelta al Juego</option>
-        </select>
-        <button class="btn" id="customStartBtn" style="margin-top:0;">Iniciar ciclo personalizado</button>
+    h += `<div class="control-block">
+        <div class="control-title">Control esencial</div>
+        <div class="control-row">
+          <div class="control-field"><label>Dolor (0-10)</label><input type="number" min="0" max="10" id="pain_${key}" value="${pain !== undefined ? pain : ''}"></div>
+          <div class="control-field"><label>ROM rodilla izq. (°)</label><input type="number" id="rom_${key}" value="${state.data[key+'_rom'] !== undefined ? state.data[key+'_rom'] : ''}"></div>
+        </div>
+        <button class="save-day-btn" onclick="saveDayControl(${w},${d})">Guardar control del día</button>
       </div>
-    `;
-    slot.appendChild(wrap);
-
-    const tg = document.getElementById('templateGrid');
-    CYCLE_TEMPLATES.forEach(t=>{
-      const b = document.createElement('div');
-      b.className = 'template-btn';
-      b.innerHTML = `<div class="t-name">${t.name}</div><div class="t-obj">${t.objetivo}</div><div class="t-weeks">${t.weeks} semanas</div>`;
-      b.addEventListener('click', ()=> startCycle(t.name, t.objetivo, t.weeks, t.phase));
-      tg.appendChild(b);
-    });
-
-    document.getElementById('customCycleToggle').addEventListener('click', ()=>{
-      const f = document.getElementById('customCycleForm');
-      f.style.display = f.style.display === 'none' ? 'block' : 'none';
-    });
-    document.getElementById('customStartBtn').addEventListener('click', ()=>{
-      const name = document.getElementById('customName').value.trim() || 'Ciclo personalizado';
-      const objetivo = document.getElementById('customObjetivo').value.trim() || 'Sin objetivo definido';
-      const weeks = parseFloat(document.getElementById('customWeeks').value) || 4;
-      const phase = Number(document.getElementById('customPhase').value);
-      startCycle(name, objetivo, weeks, phase);
-    });
-
-  } else {
-    const c = data.activeCycle;
-    const elapsed = daysBetween(c.startDate, todayStr());
-    const total = daysBetween(c.startDate, c.plannedEndDate);
-    const pct = Math.min(100, Math.max(0, Math.round((elapsed/total)*100)));
-    const card = document.createElement('div');
-    card.className = 'active-cycle-card';
-    card.innerHTML = `
-      <div class="c-name">${c.name}</div>
-      <div class="c-obj">${c.objetivo}</div>
-      <div class="c-dates">${c.startDate} → ${c.plannedEndDate} (día ${Math.max(elapsed,0)} de ${total}) · Fase: ${PHASE_NAMES[c.phase]}</div>
-      <div class="progress-bar"><div class="fill" style="width:${pct}%;"></div></div>
-      <button class="btn danger-outline" id="closeCycleBtn" style="margin-top:0;">Cerrar ciclo y ver resultados</button>
-    `;
-    slot.appendChild(card);
-    document.getElementById('closeCycleBtn').addEventListener('click', ()=>{
-      if(confirm('¿Cerrar este ciclo ahora y comparar tus resultados?')) closeCycle();
-    });
+    </div></div>`;
   }
 
-  renderCycleHistory();
-  renderPhaseSuggestionOnCiclosTab();
-}
-
-function fmtDelta(before, after, unit){
-  if(before === null || before === undefined || after === null || after === undefined) return 'sin datos suficientes';
-  const diff = after - before;
-  const sign = diff >= 0 ? '+' : '';
-  return `${before}${unit} → ${after}${unit} (${sign}${diff.toFixed(1)}${unit})`;
-}
-
-function renderCycleHistory(){
-  const list = document.getElementById('cycleHistoryList');
-  list.innerHTML = '';
-  const sorted = [...data.cycles].sort((a,b)=>b.startDate.localeCompare(a.startDate));
-  if(sorted.length === 0){
-    list.innerHTML = '<div class="empty">Aún no has cerrado ningún ciclo.</div>';
-    return;
-  }
-  sorted.forEach(c=>{
-    const row = document.createElement('div');
-    row.className = 'cycle-history-row';
-    row.innerHTML = `
-      <div class="h-name">${c.name} (${c.startDate} → ${c.endDate})</div>
-      <div class="h-line">Dolor: ${fmtDelta(c.startSnapshot.avgPain !== null ? +c.startSnapshot.avgPain.toFixed(1) : null, c.endSnapshot.avgPain !== null ? +c.endSnapshot.avgPain.toFixed(1) : null, '')}</div>
-      <div class="h-line">Peso: ${fmtDelta(c.startSnapshot.weight, c.endSnapshot.weight, 'kg')}</div>
-      <div class="h-line">ROM rodilla izq: ${fmtDelta(c.startSnapshot.rom, c.endSnapshot.rom, '°')}</div>
-      <div class="h-line">Entrenamientos: ${c.workouts} en ${c.totalDays} días · Banderas rojas: ${c.flags}</div>
-    `;
-    list.appendChild(row);
+  h += sectionTitle('🚫', 'Límites Inquebrantables', 'Si rompes uno, avisa a tu fisio');
+  h += `<div class="limits-card">`;
+  LIMITS.forEach((rule, i) => {
+    h += `<div class="limit-row" ${i===LIMITS.length-1?'style="border:none"':''}><span class="limit-x">✖</span><span class="limit-text">${rule}</span></div>`;
   });
+  h += `</div>`;
+  return h;
 }
 
-// ---- Calendar ----
-let calYear, calMonth;
-(function initCalDate(){
-  const now = new Date();
-  calYear = now.getFullYear();
-  calMonth = now.getMonth();
-})();
+function renderReviewView(ws) {
+  const w = state.week;
+  const level = currentLevel(w);
+  const avgPain = weekAvgPain(w);
+  let h = '';
+  h += `<div class="review-hero">
+    <div class="review-eyebrow">Revisión Dominical — Semana ${w}</div>
+    <div class="review-pct" style="color:${pctColor(ws.pct)}">${ws.pct}%</div>
+    <div class="review-sub">${ws.done} de ${ws.total} ejercicios completados</div>
+    ${avgPain !== null ? `<div class="review-pain">🚩 Dolor promedio de la semana: ${avgPain}/10</div>` : ''}
+  </div>`;
 
-document.getElementById('calPrev').addEventListener('click', ()=>{
-  calMonth--; if(calMonth < 0){ calMonth = 11; calYear--; }
-  renderCalendar();
-});
-document.getElementById('calNext').addEventListener('click', ()=>{
-  calMonth++; if(calMonth > 11){ calMonth = 0; calYear++; }
-  renderCalendar();
-});
-
-function renderCalendar(){
-  const label = document.getElementById('calendarMonthLabel');
-  const monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  label.textContent = monthNames[calMonth] + ' ' + calYear;
-
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '';
-
-  const firstDay = new Date(calYear, calMonth, 1);
-  const startOffset = firstDay.getDay();
-  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-
-  for(let i=0;i<startOffset;i++){
-    const blank = document.createElement('div');
-    blank.className = 'cal-cell blank';
-    grid.appendChild(blank);
+  h += sectionTitle('🔍', `Constancia por rutina — Semana ${w}`, '¿Qué día te está costando más?');
+  for (let d = 0; d < 6; d++) {
+    const type = getDayRoutineType(w, d);
+    if (!type) continue;
+    const routine = ROUTINE_LEVELS[level][type];
+    const key = dayKey(w, d);
+    let count = 0;
+    routine.exercises.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) count++; });
+    const pct = Math.round((count/routine.exercises.length)*100);
+    h += `<div class="progress-item">
+      <span class="progress-emoji">🦵</span>
+      <div class="progress-body">
+        <div class="progress-name">${DAY_NAMES[d]} — ${routine.label}</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%;background:${pctColor(pct)}"></div></div>
+      </div>
+      <span class="progress-count" style="color:${pctColor(pct)}">${count}/${routine.exercises.length}</span>
+    </div>`;
   }
 
-  for(let day=1; day<=daysInMonth; day++){
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const workout = data.workoutLog.find(w => w.date === dateStr && w.exercisesDone > 0);
-    const hasFlag = data.redFlags.some(f => f.date === dateStr);
-    const cell = document.createElement('div');
-    cell.className = 'cal-cell';
-    let dotHtml = '';
-    if(workout){
-      dotHtml = `<div class="dot dot${workout.day}"></div>`;
+  h += sectionTitle('🎯', 'Historial de Revisiones de Bloque', 'Cada 4 semanas');
+  const relevantCheckpoints = CHECKPOINT_WEEKS.filter(cw => cw <= w);
+  if (relevantCheckpoints.length === 0) {
+    h += `<div class="progress-item"><span class="progress-body" style="color:#5a5070; font-size:12px;">Tu primera revisión de bloque será en la Semana 4.</span></div>`;
+  } else {
+    h += `<div class="project-list">`;
+    relevantCheckpoints.forEach((cw, i) => {
+      const st = checkpointStatus(cw);
+      let label, color;
+      if (st.allMet) { label = '✅ Cumplido'; color = '#4ade80'; }
+      else if (st.anyMarked) { label = '⚠️ Parcial'; color = '#f59e0b'; }
+      else { label = '— Sin revisar'; color = '#5a5070'; }
+      h += `<div class="cp-history-row" ${i===relevantCheckpoints.length-1?'style="border:none"':''}><span>Semana ${cw}</span><span class="cp-history-status" style="color:${color}">${label}</span></div>`;
+    });
+    h += `</div>`;
+  }
+
+  h += sectionTitle('📈', 'Historial de Semanas', 'Tendencia de constancia');
+  h += `<div class="week-history">`;
+  const scores = [];
+  for (let ww = 1; ww <= WEEKS_TOTAL; ww++) {
+    const s = weekScore(ww);
+    scores.push({ w: ww, ...s });
+    const isActive = ww === w;
+    h += `<div class="week-pill" style="background:${s.pct===0?'#0f0f1a':'#1a1630'};border-color:${isActive?'#7c5cbf':'#1e1a2e'}">
+      <div class="week-pill-label">S${ww}</div>
+      <div class="week-pill-val" style="color:${s.pct===0?'#2a2040':pctColor(s.pct)}">${s.pct>0?s.pct+'%':'—'}</div>
+    </div>`;
+  }
+  h += `</div>`;
+
+  const completed = scores.filter(s => s.pct > 0);
+  if (completed.length > 0) {
+    const best = completed.reduce((a,b) => a.pct > b.pct ? a : b);
+    const worst = completed.length > 1 ? completed.reduce((a,b) => a.pct < b.pct ? a : b) : null;
+    h += `<div class="bw-row"><div class="bw-card best"><div class="bw-eyebrow">Mejor semana</div><div class="bw-week">S${best.w}</div><div class="bw-pct">${best.pct}%</div></div>`;
+    if (worst && worst.w !== best.w) {
+      h += `<div class="bw-card worst"><div class="bw-eyebrow">Área de mejora</div><div class="bw-week">S${worst.w}</div><div class="bw-pct">${worst.pct}%</div></div>`;
     }
-    cell.innerHTML = `<span>${day}</span>${dotHtml}${hasFlag ? '<div class="flag-dot"></div>' : ''}`;
-    grid.appendChild(cell);
+    h += `</div>`;
   }
+
+  h += `<div class="footer-note">📅 Próxima revisión: <span>Domingo</span><br>Cada casilla es información real para tu rodilla. Sin autoengaños.</div>`;
+  return h;
 }
 
-function renderAll(){
-  renderReminder();
-  renderEditBanner();
-  renderPhase();
-  renderExercises();
-  renderScoreboard();
-  renderHistory();
-  renderCharts();
-  renderSummaries();
-  renderWeightList();
-  renderRomChart();
-  renderRomList();
-  renderFlags();
-  renderCiclos();
-  renderCalendar();
-  renderPhaseSuggestionOnCiclosTab();
+function sectionTitle(emoji, title, subtitle) {
+  return `<div class="section-title"><div class="section-title-row"><span>${emoji}</span><span class="section-title-text">${title}</span></div><div class="section-subtitle">${subtitle}</div></div>`;
 }
 
-renderAll();
+function changeWeek(dir) {
+  state.week = Math.max(1, Math.min(WEEKS_TOTAL, state.week + dir));
+  render();
+  window.scrollTo(0, 0);
+}
+function setView(v) {
+  state.view = v;
+  render();
+  window.scrollTo(0, 0);
+}
+
+loadState();
+render();
 </script>
 </body>
 </html>
