@@ -74,6 +74,11 @@
   .exercise-name { font-size: 12.5px; color: #e8e4dc; font-weight: 600; }
   .exercise-reps { font-size: 10.5px; color: #5a5070; margin-top: 1px; }
   .exercise-video { display: inline-block; margin-top: 5px; font-size: 10.5px; font-weight: 700; color: #a094c0; text-decoration: none; padding: 3px 9px; background: #1a1630; border-radius: 20px; border: 1px solid #2a2040; }
+  .ex-rom-select { display: block; margin-top: 6px; background: #1a1630; border: 1px solid #2a2040; color: #a094c0; border-radius: 7px; padding: 5px 8px; font-size: 11px; font-family: inherit; max-width: 160px; }
+  .rom-info-block { background: #1a1630; border: 1px solid #2a2040; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .rom-info-text { font-size: 11px; color: #8b7fa8; line-height: 1.5; text-align: center; }
+  .exercise-group-label { font-size: 10.5px; color: #8b7fa8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin: 14px 0 4px; }
+  .exercise-group-label:first-of-type { margin-top: 4px; }
 
   .flag-toggle { width: 100%; margin-top: 4px; padding: 10px; border-radius: 8px; border: 1px solid #3a1a1a; background: #1a0f0f; color: #c0a0a0; font-size: 12px; font-weight: 700; cursor: pointer; }
   .flag-toggle.on { background: #ef4444; border-color: #ef4444; color: #fff; }
@@ -83,7 +88,7 @@
   .control-row { display: flex; gap: 10px; margin-bottom: 10px; }
   .control-field { flex: 1; }
   .control-field label { font-size: 10.5px; color: #5a5070; display: block; margin-bottom: 4px; }
-  .control-field input { width: 100%; background: #1a1630; border: 1px solid #2a2040; color: #e8e4dc; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+  .control-field input, .control-field select { width: 100%; background: #1a1630; border: 1px solid #2a2040; color: #e8e4dc; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
   .save-day-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #4c3880; color: #fff; font-weight: 700; font-size: 12.5px; cursor: pointer; }
 
   .limits-card { background: #1a0f0f; border: 1px solid #3a1a1a; border-radius: 14px; padding: 14px; }
@@ -161,7 +166,7 @@
 const WEEKS_TOTAL = 16;
 const STORAGE_KEY = 'regreso_al_juego_v6';
 
-const DAY_NAMES = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DAY_NAMES = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 
 // Programación por defecto (se puede reasignar día por día desde la app).
 const DEFAULT_DAY_MAP = { 0: 'A', 2: 'B', 4: 'C' };
@@ -243,6 +248,48 @@ const ROUTINE_LEVELS = [
 ];
 const MAX_LEVEL = ROUTINE_LEVELS.length - 1;
 
+// Calentamiento y enfriamiento: iguales para toda rutina y nivel, antes y después de la parte principal.
+const WARMUP = [
+  { id:'wu1', name:'Movilidad de tobillo y rodilla (círculos, flexo-extensión)', reps:'2-3 min' },
+  { id:'wu2', name:'Bicicleta estática suave o caminata', reps:'5 min' },
+  { id:'wu3', name:'Activación de glúteo con banda', reps:'2 x 15' },
+  { id:'wu4', name:'Sentadilla isométrica en pared (rango cómodo)', reps:'2 x 20 seg' },
+];
+const COOLDOWN = [
+  { id:'cd1', name:'Estiramiento de cuádriceps', reps:'30 seg c/lado' },
+  { id:'cd2', name:'Estiramiento de isquiotibiales', reps:'30 seg c/lado' },
+  { id:'cd3', name:'Estiramiento de pantorrilla', reps:'30 seg c/lado' },
+  { id:'cd4', name:'Hielo si hay molestia (opcional)', reps:'10-15 min' },
+];
+
+// Escala de rango de movimiento (flexión de rodilla). 140° = normal, 0° = pierna recta sin doblar.
+const ROM_OPTIONS = [
+  { value:'', short:'—', label:'Sin registrar' },
+  { value:'140', short:'140°', label:'140° — Talón casi toca el glúteo (rango completo)' },
+  { value:'120', short:'120°', label:'120° — Dobla bastante, leve restricción' },
+  { value:'110', short:'110°', label:'110°' },
+  { value:'90',  short:'90°',  label:'90° — Ángulo recto entre muslo y pantorrilla' },
+  { value:'60',  short:'60°',  label:'60° — Dobla poco más de la mitad' },
+  { value:'45',  short:'45°',  label:'45° — Dobla muy poco' },
+  { value:'25',  short:'25°',  label:'25° — Casi sin doblar' },
+  { value:'0',   short:'0°',   label:'0° — Pierna recta, sin doblar' },
+];
+
+const ROM_DIAGRAM_SVG = `<svg viewBox="0 0 220 180" style="width:100%;max-width:280px;display:block;margin:8px auto;">
+  <line x1="20" y1="150" x2="110" y2="150" stroke="#8b7fa8" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="110" cy="150" r="4" fill="#e8e4dc"/>
+  <line x1="110" y1="150" x2="190" y2="150" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+  <text x="192" y="154" fill="#ef4444" font-size="11" font-family="sans-serif">0°</text>
+  <line x1="110" y1="150" x2="166.6" y2="93.4" stroke="#5a5070" stroke-width="2" stroke-dasharray="3,3"/>
+  <text x="168" y="90" fill="#8b7fa8" font-size="11" font-family="sans-serif">45°</text>
+  <line x1="110" y1="150" x2="110" y2="70" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <text x="114" y="66" fill="#f59e0b" font-size="11" font-family="sans-serif">90°</text>
+  <line x1="110" y1="150" x2="70" y2="80.7" stroke="#5a5070" stroke-width="2" stroke-dasharray="3,3"/>
+  <text x="40" y="78" fill="#8b7fa8" font-size="11" font-family="sans-serif">120°</text>
+  <line x1="110" y1="150" x2="48.7" y2="98.6" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/>
+  <text x="10" y="100" fill="#4ade80" font-size="11" font-family="sans-serif">140°</text>
+</svg>`;
+
 const LIMITS = [
   'PROHIBIDO hacer sentadilla profunda o saltar si tu nivel actual no lo indica.',
   'PROHIBIDO ignorar un dolor arriba de 5/10 — para y ajusta el ejercicio.',
@@ -252,7 +299,7 @@ const LIMITS = [
 // Cada 4 semanas se revisa si el bloque cumplió su objetivo.
 const CHECKPOINT_WEEKS = [4, 8, 12, 16];
 
-let state = { data: {}, week: 1, view: 'week', expanded: {} };
+let state = { data: {}, week: 1, view: 'week', expanded: {}, romInfoOpen: false };
 
 function loadState() {
   try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) state.data = JSON.parse(raw); } catch(e) {}
@@ -313,10 +360,21 @@ function saveDayControl(w, d) {
   const painEl = document.getElementById(`pain_${key}`);
   const romEl = document.getElementById(`rom_${key}`);
   const pain = painEl.value === '' ? null : Number(painEl.value);
-  const rom = romEl.value === '' ? null : Number(romEl.value);
   if (pain !== null) state.data[`${key}_pain`] = pain;
-  if (rom !== null) state.data[`${key}_rom`] = rom;
+  if (romEl.value === '') delete state.data[`${key}_rom`];
+  else state.data[`${key}_rom`] = romEl.value;
   saveState();
+  render();
+}
+function setExerciseRom(w, d, exId, val) {
+  const key = `${dayKey(w,d)}_ex_${exId}_rom`;
+  if (val === '') delete state.data[key];
+  else state.data[key] = val;
+  saveState();
+  render();
+}
+function toggleRomInfo() {
+  state.romInfoOpen = !state.romInfoOpen;
   render();
 }
 
@@ -348,7 +406,7 @@ function weeksSinceStart() {
 function autoNoFlags(w) {
   const start = Math.max(1, w-1);
   for (let ww = start; ww <= w; ww++)
-    for (let d = 0; d < 6; d++)
+    for (let d = 0; d < 7; d++)
       if (state.data[`${dayKey(ww,d)}_flag`]) return false;
   return true;
 }
@@ -377,12 +435,13 @@ function currentLevel(w) {
 function weekScore(w) {
   let total = 0, done = 0;
   const level = currentLevel(w);
-  for (let d = 0; d < 6; d++) {
+  for (let d = 0; d < 7; d++) {
     const type = getDayRoutineType(w, d);
     if (!type) continue;
     const routine = ROUTINE_LEVELS[level][type];
-    total += routine.exercises.length;
-    routine.exercises.forEach(ex => { if (state.data[`${dayKey(w,d)}_ex_${ex.id}`]) done++; });
+    const allItems = [...WARMUP, ...routine.exercises, ...COOLDOWN];
+    total += allItems.length;
+    allItems.forEach(ex => { if (state.data[`${dayKey(w,d)}_ex_${ex.id}`]) done++; });
   }
   return { done, total, pct: total ? Math.round((done/total)*100) : 0 };
 }
@@ -393,7 +452,7 @@ function overallScore() {
 }
 function weekAvgPain(w) {
   const vals = [];
-  for (let d = 0; d < 6; d++) {
+  for (let d = 0; d < 7; d++) {
     const p = state.data[`${dayKey(w,d)}_pain`];
     if (p !== undefined && p !== null) vals.push(p);
   }
@@ -509,7 +568,7 @@ function renderWeekView() {
   h += `<div class="level-badge">Nivel actual: ${ROUTINE_LEVELS[level].name}</div>`;
   h += sectionTitle('📅', 'Tu Semana', 'Toca un día para abrir su carpeta');
 
-  for (let d = 0; d < 6; d++) {
+  for (let d = 0; d < 7; d++) {
     const key = dayKey(w, d);
     const isOpen = !!state.expanded[key];
     const type = getDayRoutineType(w, d);
@@ -518,8 +577,9 @@ function renderWeekView() {
 
     let doneCount = 0, totalCount = 0;
     if (routine) {
-      totalCount = routine.exercises.length;
-      routine.exercises.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) doneCount++; });
+      const allItems = [...WARMUP, ...routine.exercises, ...COOLDOWN];
+      totalCount = allItems.length;
+      allItems.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) doneCount++; });
     }
     const pain = state.data[`${key}_pain`];
     const flagged = !!state.data[`${key}_flag`];
@@ -560,30 +620,28 @@ function renderWeekView() {
         </div>`;
 
     if (routine) {
-      routine.exercises.forEach(ex => {
-        const done = !!state.data[`${key}_ex_${ex.id}`];
-        const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' técnica correcta ejercicio')}`;
-        h += `<div class="exercise-row">
-          <div class="exercise-check ${done?'done':''}" onclick="toggleExercise(${w},${d},'${ex.id}')">${done?'✓':''}</div>
-          <div>
-            <div class="exercise-name">${ex.name}</div>
-            <div class="exercise-reps">${ex.reps}</div>
-            <a class="exercise-video" href="${videoUrl}" target="_blank" rel="noopener">▶ Ver técnica</a>
-          </div>
-        </div>`;
-      });
+      h += renderExerciseGroup('🔥 Calentamiento', WARMUP, w, d, key, false);
+      h += renderExerciseGroup('🦵 Rutina principal', routine.exercises, w, d, key, true);
+      h += renderExerciseGroup('🧊 Enfriamiento y recuperación', COOLDOWN, w, d, key, false);
     } else {
       h += `<div class="rest-note">Día de descanso. Si quieres, anota abajo cómo sientes la rodilla.</div>`;
     }
 
     h += `<button class="flag-toggle ${flagged?'on':''}" onclick="toggleFlag(${w},${d})">🚩 ${flagged ? 'Hinchazón/chasquido marcado hoy' : 'Marcar hinchazón o chasquido'}</button>`;
 
+    const currentDayRom = state.data[`${key}_rom`] || '';
     h += `<div class="control-block">
         <div class="control-title">Control esencial</div>
         <div class="control-row">
           <div class="control-field"><label>Dolor (0-10)</label><input type="number" min="0" max="10" id="pain_${key}" value="${pain !== undefined ? pain : ''}"></div>
-          <div class="control-field"><label>ROM rodilla izq. (°)</label><input type="number" id="rom_${key}" value="${state.data[key+'_rom'] !== undefined ? state.data[key+'_rom'] : ''}"></div>
         </div>
+        <div class="control-field" style="margin-bottom:10px;">
+          <label>ROM general del día ${romInfoButton()}</label>
+          <select id="rom_${key}">
+            ${ROM_OPTIONS.map(o => `<option value="${o.value}" ${currentDayRom===o.value?'selected':''}>${o.label}</option>`).join('')}
+          </select>
+        </div>
+        ${state.romInfoOpen ? romInfoBlock() : ''}
         <button class="save-day-btn" onclick="saveDayControl(${w},${d})">Guardar control del día</button>
       </div>
     </div></div>`;
@@ -611,21 +669,22 @@ function renderReviewView(ws) {
   </div>`;
 
   h += sectionTitle('🔍', `Constancia por rutina — Semana ${w}`, '¿Qué día te está costando más?');
-  for (let d = 0; d < 6; d++) {
+  for (let d = 0; d < 7; d++) {
     const type = getDayRoutineType(w, d);
     if (!type) continue;
     const routine = ROUTINE_LEVELS[level][type];
     const key = dayKey(w, d);
+    const allItems = [...WARMUP, ...routine.exercises, ...COOLDOWN];
     let count = 0;
-    routine.exercises.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) count++; });
-    const pct = Math.round((count/routine.exercises.length)*100);
+    allItems.forEach(ex => { if (state.data[`${key}_ex_${ex.id}`]) count++; });
+    const pct = Math.round((count/allItems.length)*100);
     h += `<div class="progress-item">
       <span class="progress-emoji">🦵</span>
       <div class="progress-body">
         <div class="progress-name">${DAY_NAMES[d]} — ${routine.label}</div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%;background:${pctColor(pct)}"></div></div>
       </div>
-      <span class="progress-count" style="color:${pctColor(pct)}">${count}/${routine.exercises.length}</span>
+      <span class="progress-count" style="color:${pctColor(pct)}">${count}/${allItems.length}</span>
     </div>`;
   }
 
@@ -672,6 +731,39 @@ function renderReviewView(ws) {
   }
 
   h += `<div class="footer-note">📅 Próxima revisión: <span>Domingo</span><br>Cada casilla es información real para tu rodilla. Sin autoengaños.</div>`;
+  return h;
+}
+
+function romInfoButton() {
+  return `<span class="link" style="margin-left:6px; text-transform:none; font-weight:400;" onclick="toggleRomInfo()">${state.romInfoOpen ? '(ocultar diagrama)' : '(¿qué es esto? ver diagrama)'}</span>`;
+}
+function romInfoBlock() {
+  return `<div class="rom-info-block">
+    ${ROM_DIAGRAM_SVG}
+    <div class="rom-info-text">
+      <b>ROM</b> = Rango de Movimiento: hasta dónde doblas la rodilla. 140° es lo normal (talón casi toca el glúteo), 0° es pierna recta sin doblar. Elige la opción que más se parezca a lo que sientes, no necesitas medirlo exacto.
+    </div>
+  </div>`;
+}
+
+function renderExerciseGroup(label, items, w, d, key, showRom) {
+  let h = `<div class="exercise-group-label">${label}</div>`;
+  items.forEach(ex => {
+    const done = !!state.data[`${key}_ex_${ex.id}`];
+    const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' técnica correcta ejercicio')}`;
+    const romVal = state.data[`${key}_ex_${ex.id}_rom`] || '';
+    h += `<div class="exercise-row">
+      <div class="exercise-check ${done?'done':''}" onclick="toggleExercise(${w},${d},'${ex.id}')">${done?'✓':''}</div>
+      <div style="flex:1;">
+        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-reps">${ex.reps}</div>
+        <a class="exercise-video" href="${videoUrl}" target="_blank" rel="noopener">▶ Ver técnica</a>
+        ${showRom ? `<select class="ex-rom-select" onchange="setExerciseRom(${w},${d},'${ex.id}',this.value)">
+          ${ROM_OPTIONS.map(o => `<option value="${o.value}" ${romVal===o.value?'selected':''}>ROM: ${o.short}</option>`).join('')}
+        </select>` : ''}
+      </div>
+    </div>`;
+  });
   return h;
 }
 
