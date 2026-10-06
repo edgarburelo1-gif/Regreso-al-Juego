@@ -379,27 +379,50 @@ function toggleRomInfo() {
 }
 
 // ---- Fecha de inicio ----
+function localDateStr(date) {
+  const dt = date || new Date();
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+function mondayOf(dt) {
+  const m = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+  return m;
+}
+// Semana 1 = la semana (lunes a domingo) donde caiga tu fecha de inicio.
+function currentWeekNumber() {
+  if (!state.data.startDate) return 1;
+  const [y, mo, d] = state.data.startDate.split('-').map(Number);
+  const diff = Math.round((mondayOf(new Date()) - mondayOf(new Date(y, mo-1, d))) / (7*24*60*60*1000));
+  return Math.max(1, Math.min(WEEKS_TOTAL, diff + 1));
+}
+function todayDayIndex() { return (new Date().getDay() + 6) % 7; }
+function goToCurrentWeek() {
+  state.week = currentWeekNumber();
+  state.expanded[dayKey(state.week, todayDayIndex())] = true;
+}
 function markStartToday() {
-  state.data.startDate = new Date().toISOString().slice(0,10);
+  state.data.startDate = localDateStr();
+  goToCurrentWeek();
   saveState(); render();
 }
 function changeStartDate() {
-  const current = state.data.startDate || new Date().toISOString().slice(0,10);
+  const current = state.data.startDate || localDateStr();
   const nv = prompt('Fecha de inicio de tu proceso (AAAA-MM-DD):', current);
   if (!nv) return;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(nv)) { alert('Formato inválido. Usa AAAA-MM-DD.'); return; }
   state.data.startDate = nv;
+  goToCurrentWeek();
   saveState(); render();
 }
 function clearStartDate() {
   if (!confirm('¿Borrar la fecha de inicio? Vuelve a quedar sin marcar.')) return;
   delete state.data.startDate;
+  goToCurrentWeek();
   saveState(); render();
 }
 function weeksSinceStart() {
   if (!state.data.startDate) return null;
-  const diffMs = new Date() - new Date(state.data.startDate);
-  return Math.max(1, Math.floor(diffMs / (7*24*60*60*1000)) + 1);
+  return currentWeekNumber();
 }
 
 // ---- Checkpoint (c2 automático según banderas rojas) ----
@@ -480,7 +503,7 @@ function renderStartBanner() {
   }
   const weeks = weeksSinceStart();
   return `<div class="start-banner">
-    <span>📅 Iniciaste el <b>${state.data.startDate}</b> — llevas ~${weeks} semana${weeks===1?'':'s'}</span>
+    <span>📅 Iniciaste el <b>${state.data.startDate}</b> — hoy estás en la <b>semana ${weeks}</b></span>
     <span style="display:flex; gap:10px; flex-shrink:0;">
       <span class="link" onclick="changeStartDate()">cambiar</span>
       <span class="link" onclick="clearStartDate()">borrar</span>
@@ -510,6 +533,7 @@ function render() {
     <div class="week-info">
       <div class="week-title">Semana ${state.week} de ${WEEKS_TOTAL}</div>
       <div class="week-sub">${ws.done}/${ws.total} ejercicios</div>
+      ${state.week !== currentWeekNumber() ? `<div class="week-sub" style="color:#a094c0;text-decoration:underline;cursor:pointer;" onclick="goToCurrentWeek();render();">Ir a mi semana actual (${currentWeekNumber()})</div>` : ''}
     </div>
     <button class="week-btn" onclick="changeWeek(1)">▶</button>
   </div>
@@ -594,7 +618,7 @@ function renderWeekView() {
       <div class="day-folder-header" onclick="toggleDayOpen(${w},${d})">
         <span class="day-folder-icon">${routine ? '🦵' : '🛌'}</span>
         <div class="day-folder-body">
-          <div class="day-folder-name">${DAY_NAMES[d]}</div>
+          <div class="day-folder-name">${DAY_NAMES[d]}${(w === currentWeekNumber() && d === todayDayIndex()) ? ' <span style="font-size:10px;color:#a094c0;border:1px solid #4c3880;border-radius:20px;padding:1px 7px;margin-left:4px;">HOY</span>' : ''}</div>
           <div class="day-folder-sub">${routine ? routine.label : 'Descanso'}</div>
         </div>
         <div class="day-folder-badges">${badges}</div>
@@ -783,6 +807,7 @@ function setView(v) {
 }
 
 loadState();
+goToCurrentWeek();
 render();
 </script>
 </body>
