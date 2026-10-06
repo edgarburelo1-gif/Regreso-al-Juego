@@ -163,7 +163,7 @@
 <div class="toast" id="toast">✓ Guardado</div>
 
 <script>
-const WEEKS_TOTAL = 16;
+const WEEKS_TOTAL = 12;
 const STORAGE_KEY = 'regreso_al_juego_v6';
 
 const DAY_NAMES = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
@@ -297,7 +297,7 @@ const LIMITS = [
 ];
 
 // Cada 4 semanas se revisa si el bloque cumplió su objetivo.
-const CHECKPOINT_WEEKS = [4, 8, 12, 16];
+const CHECKPOINT_WEEKS = [4, 8, 12];
 
 let state = { data: {}, week: 1, view: 'week', expanded: {}, romInfoOpen: false };
 
